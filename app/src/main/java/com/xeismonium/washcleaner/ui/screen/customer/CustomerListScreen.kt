@@ -1,0 +1,299 @@
+package com.xeismonium.washcleaner.ui.screen.customer
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import com.xeismonium.washcleaner.data.local.database.entity.CustomerEntity
+import com.xeismonium.washcleaner.ui.components.common.EmptyState
+import com.xeismonium.washcleaner.ui.components.common.SearchTopAppBar
+import com.xeismonium.washcleaner.ui.theme.WashCleanerTheme
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CustomerListScreen(
+    navController: NavController,
+    viewModel: CustomerViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    val events by viewModel.events.collectAsState()
+
+    LaunchedEffect(events) {
+        when (events) {
+            is CustomerEvent.Success -> {
+                viewModel.clearEvent()
+            }
+            else -> {}
+        }
+    }
+
+    CustomerListContent(
+        uiState = uiState,
+        onSearchQueryChange = { viewModel.setSearchQuery(it) },
+        onCustomerClick = { customerId -> navController.navigate("customer_form/$customerId") },
+        onAddCustomer = { navController.navigate("customer_form/0") },
+        onRefresh = { viewModel.refresh() }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CustomerListContent(
+    uiState: CustomerUiState,
+    onSearchQueryChange: (String) -> Unit = {},
+    onCustomerClick: (Long) -> Unit = {},
+    onAddCustomer: () -> Unit = {},
+    onRefresh: () -> Unit = {}
+) {
+    var isSearchActive by remember { mutableStateOf(false) }
+
+    Scaffold(
+        topBar = {
+            if (isSearchActive) {
+                SearchTopAppBar(
+                    query = uiState.searchQuery,
+                    onQueryChange = onSearchQueryChange,
+                    onDeactivateSearch = {
+                        isSearchActive = false
+                        onSearchQueryChange("")
+                    },
+                    placeholder = "Cari nama atau no. telepon..."
+                )
+            } else {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = "Daftar Pelanggan",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
+                    actions = {
+                        IconButton(onClick = { isSearchActive = true }) {
+                            Icon(Icons.Default.Search, contentDescription = "Cari Pelanggan")
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        titleContentColor = MaterialTheme.colorScheme.onBackground,
+                        actionIconContentColor = MaterialTheme.colorScheme.onBackground
+                    )
+                )
+            }
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = onAddCustomer,
+                containerColor = MaterialTheme.colorScheme.primary,
+                shape = CircleShape
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Tambah Pelanggan",
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+            }
+        }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
+            // Customer List
+            if (uiState.isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else if (uiState.customersWithCount.isEmpty()) {
+                EmptyState(
+                    message = if (uiState.searchQuery.isNotBlank()) {
+                        "Tidak ada pelanggan ditemukan"
+                    } else {
+                        "Belum ada pelanggan"
+                    },
+                    icon = Icons.Default.Person,
+                    onAddClick = onAddCustomer,
+                    addButtonText = "Tambah Pelanggan"
+                )
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    itemsIndexed(uiState.customersWithCount) { index, customerWithCount ->
+                        CustomerListItem(
+                            customerWithCount = customerWithCount,
+                            onClick = { onCustomerClick(customerWithCount.customer.id) }
+                        )
+
+                        // Add divider except for last item
+                        if (index < uiState.customersWithCount.size - 1) {
+                            HorizontalDivider(
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                color = MaterialTheme.colorScheme.surfaceVariant
+                            )
+                        }
+                    }
+                }
+            }
+
+            uiState.error?.let { error ->
+                Snackbar(
+                    modifier = Modifier.padding(16.dp),
+                    action = {
+                        TextButton(onClick = onRefresh) {
+                            Text("Retry")
+                        }
+                    }
+                ) {
+                    Text(error)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CustomerListItem(
+    customerWithCount: CustomerWithTransactionCount,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .heightIn(min = 72.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.weight(1f)
+        ) {
+            // Avatar with initial letter
+            Surface(
+                modifier = Modifier.size(48.dp),
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.primaryContainer
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Text(
+                        text = customerWithCount.customer.name.first().uppercase(),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+            }
+
+            // Name and Phone
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = customerWithCount.customer.name,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = customerWithCount.customer.phone,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+
+        // Chevron icon
+        Icon(
+            imageVector = Icons.Default.ChevronRight,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+            modifier = Modifier.size(24.dp)
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CustomerListPreview() {
+    WashCleanerTheme {
+        CustomerListContent(
+            uiState = CustomerUiState(
+                customersWithCount = listOf(
+                    CustomerWithTransactionCount(
+                        customer = CustomerEntity(id = 1, name = "John Doe", phone = "08123456789", address = "Jl. Example No. 123"),
+                        transactionCount = 15
+                    ),
+                    CustomerWithTransactionCount(
+                        customer = CustomerEntity(id = 2, name = "Jane Smith", phone = "08234567890", address = "Jl. Test No. 456"),
+                        transactionCount = 8
+                    ),
+                    CustomerWithTransactionCount(
+                        customer = CustomerEntity(id = 3, name = "Bob Wilson", phone = "08345678901", address = ""),
+                        transactionCount = 3
+                    )
+                ),
+                searchQuery = ""
+            )
+        )
+    }
+}
