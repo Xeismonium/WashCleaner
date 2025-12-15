@@ -39,17 +39,25 @@ data class StatusStatisticsData(
     val count: Int
 )
 
+data class ChartDataPoint(
+    val label: String,
+    val value: Double,
+    val isHighlighted: Boolean = false
+)
+
 data class ReportUiState(
     val totalRevenue: Double = 0.0,
     val totalTransactions: Int = 0,
     val averageTransactionValue: Double = 0.0,
+    val trendPercentage: Double = 0.0,
     val revenueData: List<RevenueDataPoint> = emptyList(),
+    val chartData: List<ChartDataPoint> = emptyList(),
     val servicePopularityData: List<ServicePopularityData> = emptyList(),
     val topCustomersData: List<TopCustomerData> = emptyList(),
     val statusStatisticsData: List<StatusStatisticsData> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null,
-    val selectedPeriod: String = "month" // day, week, month, year
+    val selectedPeriod: String = "day" // day, week, month
 )
 
 @HiltViewModel
@@ -90,6 +98,23 @@ class ReportViewModel @Inject constructor(
                         val revenue = completed.sumOf { it.totalPrice }
                         val average = if (completed.isNotEmpty()) revenue / completed.size else 0.0
 
+                        // Calculate trend percentage (compare to previous period)
+                        val (prevStartDate, prevEndDate) = getPreviousPeriodDateRange(period)
+                        val previousTransactions = transactions.filter {
+                            it.dateIn >= prevStartDate && it.dateIn <= prevEndDate && it.status == "selesai"
+                        }
+                        val previousRevenue = previousTransactions.sumOf { it.totalPrice }
+                        val trendPercentage = if (previousRevenue > 0) {
+                            ((revenue - previousRevenue) / previousRevenue) * 100
+                        } else if (revenue > 0) {
+                            100.0
+                        } else {
+                            0.0
+                        }
+
+                        // Generate chart data
+                        val chartData = generateChartData(filteredTransactions, period)
+
                         // Load all chart data
                         loadRevenueData(filteredTransactions)
                         loadServicePopularityData()
@@ -100,6 +125,8 @@ class ReportViewModel @Inject constructor(
                             totalRevenue = revenue,
                             totalTransactions = completed.size,
                             averageTransactionValue = average,
+                            trendPercentage = trendPercentage,
+                            chartData = chartData,
                             isLoading = false,
                             error = null
                         )
@@ -118,14 +145,166 @@ class ReportViewModel @Inject constructor(
         val endDate = calendar.timeInMillis
 
         when (period) {
-            "day" -> calendar.add(Calendar.DAY_OF_YEAR, -7) // Last 7 days
-            "week" -> calendar.add(Calendar.WEEK_OF_YEAR, -4) // Last 4 weeks
-            "month" -> calendar.add(Calendar.MONTH, -6) // Last 6 months
-            "year" -> calendar.add(Calendar.YEAR, -2) // Last 2 years
+            "day" -> {
+                // Start of today
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+            }
+            "week" -> {
+                // Start of this week
+                calendar.set(Calendar.DAY_OF_WEEK, calendar.firstDayOfWeek)
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+            }
+            "month" -> {
+                // Start of this month
+                calendar.set(Calendar.DAY_OF_MONTH, 1)
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+            }
         }
 
         val startDate = calendar.timeInMillis
         return Pair(startDate, endDate)
+    }
+
+    private fun getPreviousPeriodDateRange(period: String): Pair<Long, Long> {
+        val calendar = Calendar.getInstance()
+
+        when (period) {
+            "day" -> {
+                // Yesterday
+                calendar.add(Calendar.DAY_OF_YEAR, -1)
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+                val startDate = calendar.timeInMillis
+                calendar.set(Calendar.HOUR_OF_DAY, 23)
+                calendar.set(Calendar.MINUTE, 59)
+                calendar.set(Calendar.SECOND, 59)
+                return Pair(startDate, calendar.timeInMillis)
+            }
+            "week" -> {
+                // Last week
+                calendar.add(Calendar.WEEK_OF_YEAR, -1)
+                calendar.set(Calendar.DAY_OF_WEEK, calendar.firstDayOfWeek)
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+                val startDate = calendar.timeInMillis
+                calendar.add(Calendar.DAY_OF_YEAR, 6)
+                calendar.set(Calendar.HOUR_OF_DAY, 23)
+                calendar.set(Calendar.MINUTE, 59)
+                calendar.set(Calendar.SECOND, 59)
+                return Pair(startDate, calendar.timeInMillis)
+            }
+            "month" -> {
+                // Last month
+                calendar.add(Calendar.MONTH, -1)
+                calendar.set(Calendar.DAY_OF_MONTH, 1)
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+                val startDate = calendar.timeInMillis
+                calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
+                calendar.set(Calendar.HOUR_OF_DAY, 23)
+                calendar.set(Calendar.MINUTE, 59)
+                calendar.set(Calendar.SECOND, 59)
+                return Pair(startDate, calendar.timeInMillis)
+            }
+            else -> return Pair(0L, 0L)
+        }
+    }
+
+    private fun generateChartData(
+        transactions: List<com.xeismonium.washcleaner.data.local.database.entity.LaundryTransactionEntity>,
+        period: String
+    ): List<ChartDataPoint> {
+        val completedTransactions = transactions.filter { it.status == "selesai" }
+
+        return when (period) {
+            "day" -> {
+                // Group by hour intervals (e.g., 08:00, 12:00, 16:00, 20:00)
+                val hourIntervals = listOf(8, 12, 16, 20)
+                val hourFormat = SimpleDateFormat("HH", Locale("id", "ID"))
+
+                val grouped = completedTransactions.groupBy { transaction ->
+                    val hour = hourFormat.format(Date(transaction.dateIn)).toIntOrNull() ?: 0
+                    hourIntervals.minByOrNull { kotlin.math.abs(it - hour) } ?: 8
+                }
+
+                val maxRevenue = grouped.values.maxOfOrNull { txList -> txList.sumOf { it.totalPrice } } ?: 1.0
+
+                hourIntervals.map { hour ->
+                    val revenue = grouped[hour]?.sumOf { it.totalPrice } ?: 0.0
+                    ChartDataPoint(
+                        label = String.format("%02d:00", hour),
+                        value = revenue,
+                        isHighlighted = grouped[hour]?.sumOf { it.totalPrice } == maxRevenue && maxRevenue > 0
+                    )
+                }
+            }
+            "week" -> {
+                // Group by day of week
+                val dayFormat = SimpleDateFormat("EEE", Locale("id", "ID"))
+                val calendar = Calendar.getInstance()
+
+                val grouped = completedTransactions.groupBy { transaction ->
+                    calendar.timeInMillis = transaction.dateIn
+                    calendar.get(Calendar.DAY_OF_WEEK)
+                }
+
+                val maxRevenue = grouped.values.maxOfOrNull { txList -> txList.sumOf { it.totalPrice } } ?: 1.0
+                val days = listOf(
+                    Calendar.MONDAY to "Sen",
+                    Calendar.TUESDAY to "Sel",
+                    Calendar.WEDNESDAY to "Rab",
+                    Calendar.THURSDAY to "Kam",
+                    Calendar.FRIDAY to "Jum",
+                    Calendar.SATURDAY to "Sab",
+                    Calendar.SUNDAY to "Min"
+                )
+
+                days.map { (dayOfWeek, label) ->
+                    val revenue = grouped[dayOfWeek]?.sumOf { it.totalPrice } ?: 0.0
+                    ChartDataPoint(
+                        label = label,
+                        value = revenue,
+                        isHighlighted = revenue == maxRevenue && maxRevenue > 0
+                    )
+                }
+            }
+            "month" -> {
+                // Group by week of month
+                val calendar = Calendar.getInstance()
+
+                val grouped = completedTransactions.groupBy { transaction ->
+                    calendar.timeInMillis = transaction.dateIn
+                    calendar.get(Calendar.WEEK_OF_MONTH)
+                }
+
+                val maxRevenue = grouped.values.maxOfOrNull { txList -> txList.sumOf { it.totalPrice } } ?: 1.0
+
+                (1..4).map { week ->
+                    val revenue = grouped[week]?.sumOf { it.totalPrice } ?: 0.0
+                    ChartDataPoint(
+                        label = "Mgg $week",
+                        value = revenue,
+                        isHighlighted = revenue == maxRevenue && maxRevenue > 0
+                    )
+                }
+            }
+            else -> emptyList()
+        }
     }
 
     private suspend fun loadRevenueData(transactions: List<com.xeismonium.washcleaner.data.local.database.entity.LaundryTransactionEntity>) {
