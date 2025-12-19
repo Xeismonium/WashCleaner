@@ -66,6 +66,8 @@ import com.xeismonium.washcleaner.ui.components.settings.SettingsItem
 import com.xeismonium.washcleaner.ui.components.settings.ThemeItem
 import com.xeismonium.washcleaner.ui.theme.WashCleanerTheme
 
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
@@ -93,7 +95,8 @@ fun SettingsScreen(
         onBackupDatabase = viewModel::backupDataAsDatabase,
         onRestoreJson = { showRestoreDialog = true },
         onRestoreDatabase = { showRestoreDialog = true },
-        onClearMessage = viewModel::clearMessage
+        onClearMessage = viewModel::clearMessage,
+        onBackClick = { navController.popBackStack() }
     )
 
     if (showRestoreDialog) {
@@ -119,7 +122,8 @@ fun SettingsContent(
     onBackupDatabase: () -> Unit = {},
     onRestoreJson: () -> Unit = {},
     onRestoreDatabase: () -> Unit = {},
-    onClearMessage: () -> Unit = {}
+    onClearMessage: () -> Unit = {},
+    onBackClick: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -129,6 +133,14 @@ fun SettingsContent(
                         text = "Pengaturan",
                         fontWeight = FontWeight.Bold
                     )
+                },
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Kembali"
+                        )
+                    }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,

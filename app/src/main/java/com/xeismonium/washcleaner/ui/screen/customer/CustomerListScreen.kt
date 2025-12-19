@@ -55,6 +55,8 @@ import com.xeismonium.washcleaner.ui.components.common.SearchTopAppBar
 import com.xeismonium.washcleaner.ui.components.customer.CustomerListItem
 import com.xeismonium.washcleaner.ui.theme.WashCleanerTheme
 
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomerListScreen(
@@ -78,7 +80,8 @@ fun CustomerListScreen(
         onSearchQueryChange = { viewModel.setSearchQuery(it) },
         onCustomerClick = { customerId -> navController.navigate("customer_form/$customerId") },
         onAddCustomer = { navController.navigate("customer_form/0") },
-        onRefresh = { viewModel.refresh() }
+        onRefresh = { viewModel.refresh() },
+        onBackClick = { navController.popBackStack() }
     )
 }
 
@@ -89,7 +92,8 @@ fun CustomerListContent(
     onSearchQueryChange: (String) -> Unit = {},
     onCustomerClick: (Long) -> Unit = {},
     onAddCustomer: () -> Unit = {},
-    onRefresh: () -> Unit = {}
+    onRefresh: () -> Unit = {},
+    onBackClick: () -> Unit = {}
 ) {
     var isSearchActive by remember { mutableStateOf(false) }
 
@@ -112,6 +116,14 @@ fun CustomerListContent(
                             text = "Daftar Pelanggan",
                             fontWeight = FontWeight.Bold
                         )
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onBackClick) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Kembali"
+                            )
+                        }
                     },
                     actions = {
                         IconButton(onClick = { isSearchActive = true }) {

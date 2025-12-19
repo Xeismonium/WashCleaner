@@ -65,6 +65,11 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransactionListScreen(
@@ -79,7 +84,8 @@ fun TransactionListScreen(
         onFilterStatusChange = { viewModel.filterByStatus(it) },
         onTransactionClick = { id -> navController.navigate("transaction_detail/$id") },
         onAddTransaction = { navController.navigate("transaction_form/0") },
-        onRefresh = { viewModel.refresh() }
+        onRefresh = { viewModel.refresh() },
+        onBackClick = { navController.popBackStack() }
     )
 }
 
@@ -91,56 +97,49 @@ fun TransactionListContent(
     onFilterStatusChange: (String?) -> Unit = {},
     onTransactionClick: (Long) -> Unit = {},
     onAddTransaction: () -> Unit = {},
-    onRefresh: () -> Unit = {}
+    onRefresh: () -> Unit = {},
+    onBackClick: () -> Unit = {}
 ) {
     val colorScheme = MaterialTheme.colorScheme
 
     Scaffold(
+        topBar = {
+            Column {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = "Transaksi Laundry",
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 28.sp
+                        )
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onBackClick) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Kembali"
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = colorScheme.background,
+                        titleContentColor = colorScheme.onBackground,
+                        navigationIconContentColor = colorScheme.onBackground
+                    )
+                )
+                
+                // Search Bar within header area but outside TopAppBar to match design
+                Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                    TransactionSearchBar(
+                        query = uiState.searchQuery,
+                        onQueryChange = onSearchQueryChange,
+                        placeholder = "Cari nama atau nomor nota..."
+                    )
+                }
+            }
+        },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = onAddTransaction,
-                containerColor = colorScheme.primary,
-                shape = CircleShape,
-                modifier = Modifier.size(56.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Tambah Transaksi",
-                    tint = colorScheme.onPrimary,
-                    modifier = Modifier.size(28.dp)
-                )
-            }
-        }
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .background(colorScheme.background)
-        ) {
-            // Top App Bar with Title
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 16.dp)
-            ) {
-                Text(
-                    text = "Transaksi Laundry",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 28.sp,
-                    color = colorScheme.onBackground
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Search Bar
-                TransactionSearchBar(
-                    query = uiState.searchQuery,
-                    onQueryChange = onSearchQueryChange,
-                    placeholder = "Cari nama atau nomor nota..."
-                )
-            }
 
             // Filter Chips
             TransactionFilterChips(

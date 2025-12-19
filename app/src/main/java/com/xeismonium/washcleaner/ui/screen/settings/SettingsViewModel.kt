@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import com.xeismonium.washcleaner.data.local.datastore.UserPreferencesRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,6 +19,7 @@ enum class ThemeMode {
 data class SettingsUiState(
     val appVersion: String = "1.0.0",
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
+    val lastScreenRoute: String? = null,
     val isBackingUp: Boolean = false,
     val isRestoring: Boolean = false,
     val error: String? = null,
@@ -29,8 +31,6 @@ sealed class SettingsEvent {
     data class RestoreCompleted(val message: String) : SettingsEvent()
     data class Error(val message: String) : SettingsEvent()
 }
-
-import com.xeismonium.washcleaner.data.local.datastore.UserPreferencesRepository
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
@@ -45,13 +45,20 @@ class SettingsViewModel @Inject constructor(
     val events: StateFlow<SettingsEvent?> = _events.asStateFlow()
 
     init {
-        observeThemeMode()
+        observePreferences()
     }
 
-    private fun observeThemeMode() {
+    private fun observePreferences() {
         viewModelScope.launch {
-            userPreferencesRepository.themeMode.collect { mode ->
-                _uiState.value = _uiState.value.copy(themeMode = mode)
+            launch {
+                userPreferencesRepository.themeMode.collect { mode ->
+                    _uiState.value = _uiState.value.copy(themeMode = mode)
+                }
+            }
+            launch {
+                userPreferencesRepository.lastScreenRoute.collect { route ->
+                    _uiState.value = _uiState.value.copy(lastScreenRoute = route)
+                }
             }
         }
     }
@@ -62,6 +69,16 @@ class SettingsViewModel @Inject constructor(
                 userPreferencesRepository.setThemeMode(mode)
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(error = e.message)
+            }
+        }
+    }
+
+    fun setLastScreenRoute(route: String) {
+        viewModelScope.launch {
+            try {
+                userPreferencesRepository.setLastScreenRoute(route)
+            } catch (e: Exception) {
+                // Ignore error for non-critical preference
             }
         }
     }

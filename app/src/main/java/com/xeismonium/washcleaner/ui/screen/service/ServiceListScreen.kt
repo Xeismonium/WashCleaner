@@ -47,6 +47,8 @@ import com.xeismonium.washcleaner.ui.theme.WashCleanerTheme
 import java.text.NumberFormat
 import java.util.Locale
 
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ServiceListScreen(
@@ -71,7 +73,8 @@ fun ServiceListScreen(
         onServiceClick = { serviceId -> navController.navigate("service_form/$serviceId") },
         onToggleStatus = { service -> viewModel.toggleServiceStatus(service) },
         onAddService = { navController.navigate("service_form/0") },
-        onRefresh = { viewModel.refresh() }
+        onRefresh = { viewModel.refresh() },
+        onBackClick = { navController.popBackStack() }
     )
 }
 
@@ -83,7 +86,8 @@ fun ServiceListContent(
     onServiceClick: (Long) -> Unit = {},
     onToggleStatus: (ServiceEntity) -> Unit = {},
     onAddService: () -> Unit = {},
-    onRefresh: () -> Unit = {}
+    onRefresh: () -> Unit = {},
+    onBackClick: () -> Unit = {}
 ) {
     var isSearchActive by remember { mutableStateOf(false) }
 
@@ -105,6 +109,14 @@ fun ServiceListContent(
                             text = "Daftar Layanan",
                             fontWeight = FontWeight.Bold
                         )
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onBackClick) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Kembali"
+                            )
+                        }
                     },
                     actions = {
                         IconButton(onClick = { isSearchActive = true }) {

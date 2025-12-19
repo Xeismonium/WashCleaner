@@ -42,26 +42,60 @@ import com.xeismonium.washcleaner.ui.theme.StatusCompleted
 import com.xeismonium.washcleaner.ui.theme.StatusProcessing
 import com.xeismonium.washcleaner.ui.theme.WashCleanerTheme
 
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.rememberCoroutineScope
+import com.xeismonium.washcleaner.ui.components.navigation.DrawerContent
+import com.xeismonium.washcleaner.ui.navigation.Screen
+import com.xeismonium.washcleaner.ui.screen.settings.SettingsViewModel
+import kotlinx.coroutines.launch
+
 @Composable
 fun DashboardScreen(
     navController: NavController,
-    viewModel: DashboardViewModel = hiltViewModel()
+    viewModel: DashboardViewModel = hiltViewModel(),
+    settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
 
-    DashboardContent(
-        uiState = uiState,
-        onNewTransaction = { navController.navigate("transaction_form/0") },
-        onViewAllTransactions = { navController.navigate("transaction_list") },
-        onNavigateToServices = { navController.navigate("service_list") },
-        onNavigateToCustomers = { navController.navigate("customer_list") }
-    )
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            DrawerContent(
+                currentRoute = Screen.Dashboard.route,
+                onItemClick = { item ->
+                    scope.launch {
+                        drawerState.close()
+                        settingsViewModel.setLastScreenRoute(item.route)
+                        if (item.route != Screen.Dashboard.route) {
+                            navController.navigate(item.route)
+                        }
+                    }
+                }
+            )
+        }
+    ) {
+        DashboardContent(
+            uiState = uiState,
+            onOpenDrawer = {
+                scope.launch { drawerState.open() }
+            },
+            onNewTransaction = { navController.navigate("transaction_form/0") },
+            onViewAllTransactions = { navController.navigate("transaction_list") },
+            onNavigateToServices = { navController.navigate("service_list") },
+            onNavigateToCustomers = { navController.navigate("customer_list") }
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardContent(
     uiState: DashboardUiState,
+    onOpenDrawer: () -> Unit = {},
     onNewTransaction: () -> Unit = {},
     onViewAllTransactions: () -> Unit = {},
     onNavigateToServices: () -> Unit = {},
@@ -79,6 +113,15 @@ fun DashboardContent(
                             "Dasbor Utama",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
+                        )
+                    }
+                },
+                navigationIcon = {
+                    IconButton(onClick = onOpenDrawer) {
+                        Icon(
+                            Icons.Default.Menu,
+                            contentDescription = "Menu",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 },

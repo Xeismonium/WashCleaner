@@ -14,6 +14,7 @@ class UserPreferencesRepository @Inject constructor(
 ) {
     private object PreferencesKeys {
         val THEME_MODE = stringPreferencesKey("theme_mode")
+        val LAST_SCREEN_ROUTE = stringPreferencesKey("last_screen_route")
     }
 
     val themeMode: Flow<ThemeMode> = dataStore.data
@@ -26,9 +27,20 @@ class UserPreferencesRepository @Inject constructor(
             }
         }
 
+    val lastScreenRoute: Flow<String?> = dataStore.data
+        .map { preferences ->
+            preferences[PreferencesKeys.LAST_SCREEN_ROUTE]
+        }
+
     suspend fun setThemeMode(themeMode: ThemeMode) {
         dataStore.edit { preferences ->
             preferences[PreferencesKeys.THEME_MODE] = themeMode.name
+        }
+    }
+
+    suspend fun setLastScreenRoute(route: String) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.LAST_SCREEN_ROUTE] = route
         }
     }
 }
