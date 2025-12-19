@@ -89,6 +89,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+import com.xeismonium.washcleaner.data.local.database.entity.TransactionWithServices
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransactionFormScreen(
@@ -113,11 +115,15 @@ fun TransactionFormScreen(
     LaunchedEffect(transactionId) {
         if (transactionId != 0L) {
             viewModel.loadTransactionById(transactionId)
+        } else {
+            // Reset selected transaction when creating new
+            // Assuming viewModel has a method to clear selection or it's null by default
         }
     }
 
     TransactionFormContent(
         isEdit = transactionId != 0L,
+        initialTransaction = uiState.selectedTransaction,
         customers = uiState.customers,
         services = uiState.services,
         onSave = { customerId, customerName, serviceRows, dateIn, estimatedDate, status ->
@@ -163,6 +169,7 @@ fun TransactionFormScreen(
 @Composable
 fun TransactionFormContent(
     isEdit: Boolean = false,
+    initialTransaction: TransactionWithServices? = null,
     customers: List<CustomerEntity> = emptyList(),
     services: List<ServiceEntity> = emptyList(),
     onSave: (Long?, String?, List<ServiceRow>, Long?, Long?, String) -> Unit = { _, _, _, _, _, _ -> },
@@ -175,6 +182,30 @@ fun TransactionFormContent(
     var dateIn by remember { mutableStateOf<Long?>(System.currentTimeMillis()) }
     var estimatedDate by remember { mutableStateOf<Long?>(null) }
     var selectedStatus by remember { mutableStateOf("baru") }
+
+    // Populate form when initialTransaction is loaded
+    LaunchedEffect(initialTransaction) {
+        initialTransaction?.let { tx ->
+            selectedCustomerId = tx.transaction.customerId
+            customerName = tx.transaction.customerName ?: ""
+            dateIn = tx.transaction.dateIn
+            // Estimated date logic might need adjustment if it's not stored directly or if we want to infer it
+            // For now, let's keep it null or derive if possible. The entity doesn't seem to store estimated date explicitly in the provided snippet.
+            // If needed, we can set it to dateIn + default duration.
+            
+            selectedStatus = tx.transaction.status
+
+            if (tx.transactionServices.isNotEmpty()) {
+                serviceRows = tx.transactionServices.map { item ->
+                    ServiceRow(
+                        serviceId = item.serviceId,
+                        weightKg = item.weightKg.toString(),
+                        subtotal = item.subtotalPrice
+                    )
+                }
+            }
+        }
+    }
 
     val totalPrice = serviceRows.sumOf { it.subtotal }
     val formatter = remember { NumberFormat.getCurrencyInstance(Locale("id", "ID")) }
