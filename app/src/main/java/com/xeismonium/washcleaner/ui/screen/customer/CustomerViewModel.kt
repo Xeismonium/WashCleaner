@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -77,20 +78,22 @@ class CustomerViewModel @Inject constructor(
     private fun loadCustomersWithTransactionCount(customers: List<CustomerEntity>) {
         viewModelScope.launch {
             try {
-                val customersWithCount = customers.map { customer ->
-                    var count = 0
-
-                    // Get transaction count for this customer
-                    customer.id.let { customerId ->
-                        transactionRepository.getByCustomerId(customerId)
-                            .collect { transactions ->
-                                count = transactions.size
-                            }
+                val customersWithCount = mutableListOf<CustomerWithTransactionCount>()
+                
+                for (customer in customers) {
+                    // Get transaction count for this customer (snapshot)
+                    val count = try {
+                        val transactions = transactionRepository.getByCustomerId(customer.id).first()
+                        transactions.size
+                    } catch (e: Exception) {
+                        0
                     }
 
-                    CustomerWithTransactionCount(
-                        customer = customer,
-                        transactionCount = count
+                    customersWithCount.add(
+                        CustomerWithTransactionCount(
+                            customer = customer,
+                            transactionCount = count
+                        )
                     )
                 }
 
