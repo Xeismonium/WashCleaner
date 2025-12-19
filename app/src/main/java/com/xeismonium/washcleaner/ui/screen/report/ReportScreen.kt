@@ -49,6 +49,8 @@ import com.xeismonium.washcleaner.ui.theme.WashCleanerTheme
 import java.text.NumberFormat
 import java.util.Locale
 
+import com.xeismonium.washcleaner.ui.components.common.WashCleanerScaffold
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReportScreen(
@@ -77,128 +79,80 @@ fun ReportContent(
 ) {
     val formatter = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Laporan Pendapatan",
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Kembali"
-                        )
-                    }
-                },
-                actions = {
-                    Spacer(modifier = Modifier.size(48.dp))
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0.8f),
-                    titleContentColor = MaterialTheme.colorScheme.onBackground
+    WashCleanerScaffold(
+        title = "Laporan Pendapatan",
+        onBackClick = onBackClick,
+        isLoading = uiState.isLoading,
+        error = uiState.error,
+        onRefresh = onRefresh
+    ) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            item {
+                SegmentedButtons(
+                    selectedPeriod = uiState.selectedPeriod,
+                    onPeriodChange = onPeriodChange
                 )
-            )
-        }
-    ) { padding ->
-        if (uiState.isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
             }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-                contentPadding = PaddingValues(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                item {
-                    SegmentedButtons(
-                        selectedPeriod = uiState.selectedPeriod,
-                        onPeriodChange = onPeriodChange
+
+            item {
+                SummaryCard(
+                    totalRevenue = uiState.totalRevenue,
+                    trendPercentage = uiState.trendPercentage,
+                    selectedPeriod = uiState.selectedPeriod,
+                    formatter = formatter
+                )
+            }
+
+            item {
+                RevenueChartCard(chartData = uiState.chartData)
+            }
+
+            item {
+                ReportStatsCard(
+                    title = "Transaksi Selesai",
+                    value = "${uiState.totalTransactions}",
+                    icon = Icons.Default.ReceiptLong,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+
+            item {
+                ReportStatsCard(
+                    title = "Rata-rata / Transaksi",
+                    value = formatter.format(uiState.averageTransactionValue),
+                    icon = Icons.Default.Payments,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(
+                    onClick = onDownloadClick,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Download,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp)
                     )
-                }
-
-                item {
-                    SummaryCard(
-                        totalRevenue = uiState.totalRevenue,
-                        trendPercentage = uiState.trendPercentage,
-                        selectedPeriod = uiState.selectedPeriod,
-                        formatter = formatter
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Unduh Laporan",
+                        fontWeight = FontWeight.SemiBold
                     )
-                }
-
-                item {
-                    RevenueChartCard(chartData = uiState.chartData)
-                }
-
-                item {
-                    ReportStatsCard(
-                        title = "Transaksi Selesai",
-                        value = "${uiState.totalTransactions}",
-                        icon = Icons.Default.ReceiptLong,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-
-                item {
-                    ReportStatsCard(
-                        title = "Rata-rata / Transaksi",
-                        value = formatter.format(uiState.averageTransactionValue),
-                        icon = Icons.Default.Payments,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-
-                item {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(
-                        onClick = onDownloadClick,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(48.dp),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Icon(
-                            Icons.Default.Download,
-                            contentDescription = null,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "Unduh Laporan",
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
-                }
-
-                item {
-                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
-        }
 
-        uiState.error?.let { error ->
-            Snackbar(
-                modifier = Modifier.padding(16.dp),
-                action = {
-                    TextButton(onClick = onRefresh) {
-                        Text("Retry")
-                    }
-                }
-            ) {
-                Text(error)
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }

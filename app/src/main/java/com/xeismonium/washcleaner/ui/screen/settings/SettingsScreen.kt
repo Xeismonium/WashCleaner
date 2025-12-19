@@ -66,7 +66,7 @@ import com.xeismonium.washcleaner.ui.components.settings.SettingsItem
 import com.xeismonium.washcleaner.ui.components.settings.ThemeItem
 import com.xeismonium.washcleaner.ui.theme.WashCleanerTheme
 
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import com.xeismonium.washcleaner.ui.components.common.WashCleanerScaffold
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -125,48 +125,25 @@ fun SettingsContent(
     onClearMessage: () -> Unit = {},
     onBackClick: () -> Unit = {}
 ) {
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = "Pengaturan",
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Kembali"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    titleContentColor = MaterialTheme.colorScheme.onBackground
-                )
-            )
-        }
-    ) { padding ->
+    WashCleanerScaffold(
+        title = "Pengaturan",
+        onBackClick = onBackClick,
+        error = uiState.error,
+        onRefresh = onClearMessage
+    ) {
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
+            modifier = Modifier.fillMaxSize()
         ) {
             // Messages
             item {
                 AnimatedVisibility(
-                    visible = uiState.successMessage != null || uiState.error != null,
+                    visible = uiState.successMessage != null,
                     enter = fadeIn() + expandVertically(),
                     exit = fadeOut() + shrinkVertically()
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         uiState.successMessage?.let {
                             MessageBanner(message = it, isError = false, onDismiss = onClearMessage)
-                        }
-                        uiState.error?.let {
-                            MessageBanner(message = it, isError = true, onDismiss = onClearMessage)
                         }
                     }
                 }

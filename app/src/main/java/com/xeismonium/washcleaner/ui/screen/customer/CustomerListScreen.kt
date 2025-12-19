@@ -55,7 +55,7 @@ import com.xeismonium.washcleaner.ui.components.common.SearchTopAppBar
 import com.xeismonium.washcleaner.ui.components.customer.CustomerListItem
 import com.xeismonium.washcleaner.ui.theme.WashCleanerTheme
 
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import com.xeismonium.washcleaner.ui.components.common.WashCleanerScaffold
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -95,49 +95,15 @@ fun CustomerListContent(
     onRefresh: () -> Unit = {},
     onBackClick: () -> Unit = {}
 ) {
-    var isSearchActive by remember { mutableStateOf(false) }
-
-    Scaffold(
-        topBar = {
-            if (isSearchActive) {
-                SearchTopAppBar(
-                    query = uiState.searchQuery,
-                    onQueryChange = onSearchQueryChange,
-                    onDeactivateSearch = {
-                        isSearchActive = false
-                        onSearchQueryChange("")
-                    },
-                    placeholder = "Cari nama atau no. telepon..."
-                )
-            } else {
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = "Daftar Pelanggan",
-                            fontWeight = FontWeight.Bold
-                        )
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = onBackClick) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Kembali"
-                            )
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = { isSearchActive = true }) {
-                            Icon(Icons.Default.Search, contentDescription = "Cari Pelanggan")
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.background,
-                        titleContentColor = MaterialTheme.colorScheme.onBackground,
-                        actionIconContentColor = MaterialTheme.colorScheme.onBackground
-                    )
-                )
-            }
-        },
+    WashCleanerScaffold(
+        title = "Daftar Pelanggan",
+        onBackClick = onBackClick,
+        isLoading = uiState.isLoading,
+        error = uiState.error,
+        onRefresh = onRefresh,
+        searchQuery = uiState.searchQuery,
+        onSearchQueryChange = onSearchQueryChange,
+        searchPlaceholder = "Cari nama atau no. telepon...",
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onAddCustomer,
@@ -151,21 +117,11 @@ fun CustomerListContent(
                 )
             }
         }
-    ) { padding ->
+    ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
+            modifier = Modifier.fillMaxSize()
         ) {
-            // Customer List
-            if (uiState.isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            } else if (uiState.customersWithCount.isEmpty()) {
+            if (uiState.customersWithCount.isEmpty() && !uiState.isLoading) {
                 EmptyState(
                     message = if (uiState.searchQuery.isNotBlank()) {
                         "Tidak ada pelanggan ditemukan"
@@ -176,7 +132,7 @@ fun CustomerListContent(
                     onAddClick = onAddCustomer,
                     addButtonText = "Tambah Pelanggan"
                 )
-            } else {
+            } else if (uiState.customersWithCount.isNotEmpty()) {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize()
                 ) {
@@ -194,19 +150,6 @@ fun CustomerListContent(
                             )
                         }
                     }
-                }
-            }
-
-            uiState.error?.let { error ->
-                Snackbar(
-                    modifier = Modifier.padding(16.dp),
-                    action = {
-                        TextButton(onClick = onRefresh) {
-                            Text("Retry")
-                        }
-                    }
-                ) {
-                    Text(error)
                 }
             }
         }

@@ -47,7 +47,7 @@ import com.xeismonium.washcleaner.ui.theme.WashCleanerTheme
 import java.text.NumberFormat
 import java.util.Locale
 
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import com.xeismonium.washcleaner.ui.components.common.WashCleanerScaffold
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -89,48 +89,14 @@ fun ServiceListContent(
     onRefresh: () -> Unit = {},
     onBackClick: () -> Unit = {}
 ) {
-    var isSearchActive by remember { mutableStateOf(false) }
-
-    Scaffold(
-        topBar = {
-            if (isSearchActive) {
-                SearchTopAppBar(
-                    query = uiState.searchQuery,
-                    onQueryChange = onSearchQueryChange,
-                    onDeactivateSearch = {
-                        isSearchActive = false
-                        onSearchQueryChange("")
-                    }
-                )
-            } else {
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = "Daftar Layanan",
-                            fontWeight = FontWeight.Bold
-                        )
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = onBackClick) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Kembali"
-                            )
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = { isSearchActive = true }) {
-                            Icon(Icons.Default.Search, contentDescription = "Cari Layanan")
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.background,
-                        titleContentColor = MaterialTheme.colorScheme.onBackground,
-                        actionIconContentColor = MaterialTheme.colorScheme.onBackground
-                    )
-                )
-            }
-        },
+    WashCleanerScaffold(
+        title = "Daftar Layanan",
+        onBackClick = onBackClick,
+        isLoading = uiState.isLoading,
+        error = uiState.error,
+        onRefresh = onRefresh,
+        searchQuery = uiState.searchQuery,
+        onSearchQueryChange = onSearchQueryChange,
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onAddService,
@@ -144,21 +110,11 @@ fun ServiceListContent(
                 )
             }
         }
-    ) { padding ->
+    ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
+            modifier = Modifier.fillMaxSize()
         ) {
-            // Service List
-            if (uiState.isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            } else if (uiState.services.isEmpty()) {
+            if (uiState.services.isEmpty() && !uiState.isLoading) {
                 EmptyState(
                     message = if (uiState.searchQuery.isNotBlank()) {
                         "Tidak ada layanan ditemukan"
@@ -169,7 +125,7 @@ fun ServiceListContent(
                     onAddClick = onAddService,
                     addButtonText = "Tambah Layanan"
                 )
-            } else {
+            } else if (uiState.services.isNotEmpty()) {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
@@ -185,19 +141,6 @@ fun ServiceListContent(
                             onMoreClick = { onToggleStatus(service) }
                         )
                     }
-                }
-            }
-
-            uiState.error?.let { error ->
-                Snackbar(
-                    modifier = Modifier.padding(16.dp),
-                    action = {
-                        TextButton(onClick = onRefresh) {
-                            Text("Retry")
-                        }
-                    }
-                ) {
-                    Text(error)
                 }
             }
         }

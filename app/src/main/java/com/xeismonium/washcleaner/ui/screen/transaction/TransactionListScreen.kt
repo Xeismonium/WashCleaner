@@ -65,10 +65,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import com.xeismonium.washcleaner.ui.components.common.WashCleanerScaffold
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -102,43 +99,15 @@ fun TransactionListContent(
 ) {
     val colorScheme = MaterialTheme.colorScheme
 
-    Scaffold(
-        topBar = {
-            Column {
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = "Transaksi Laundry",
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 28.sp
-                        )
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = onBackClick) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Kembali"
-                            )
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = colorScheme.background,
-                        titleContentColor = colorScheme.onBackground,
-                        navigationIconContentColor = colorScheme.onBackground
-                    )
-                )
-                
-                // Search Bar within header area but outside TopAppBar to match design
-                Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                    TransactionSearchBar(
-                        query = uiState.searchQuery,
-                        onQueryChange = onSearchQueryChange,
-                        placeholder = "Cari nama atau nomor nota..."
-                    )
-                }
-            }
-        },
+    WashCleanerScaffold(
+        title = "Transaksi Laundry",
+        onBackClick = onBackClick,
+        isLoading = uiState.isLoading,
+        error = uiState.error,
+        onRefresh = onRefresh,
+        searchQuery = uiState.searchQuery,
+        onSearchQueryChange = onSearchQueryChange,
+        searchPlaceholder = "Cari nama atau nomor nota...",
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onAddTransaction,
@@ -154,11 +123,10 @@ fun TransactionListContent(
                 )
             }
         }
-    ) { padding ->
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
                 .background(colorScheme.background)
         ) {
             // Filter Chips
@@ -170,14 +138,7 @@ fun TransactionListContent(
             )
 
             // Transaction List
-            if (uiState.isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            } else if (uiState.transactions.isEmpty()) {
+            if (uiState.transactions.isEmpty() && !uiState.isLoading) {
                 TransactionEmptyState(
                     message = if (uiState.searchQuery.isNotBlank() || uiState.filterStatus != null) {
                         "Tidak ada transaksi ditemukan"
@@ -186,7 +147,7 @@ fun TransactionListContent(
                     },
                     subtitle = "Tekan tombol '+' untuk menambah transaksi baru."
                 )
-            } else {
+            } else if (uiState.transactions.isNotEmpty()) {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(
@@ -210,51 +171,6 @@ fun TransactionListContent(
                                 transaction = transaction,
                                 onClick = { onTransactionClick(transaction.id) }
                             )
-                        }
-                    }
-                }
-            }
-
-            // Error Snackbar
-            AnimatedVisibility(
-                visible = uiState.error != null,
-                enter = slideInVertically { it },
-                exit = slideOutVertically { it }
-            ) {
-                uiState.error?.let { error ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = colorScheme.errorContainer
-                        ),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Error,
-                                    contentDescription = null,
-                                    tint = colorScheme.error
-                                )
-                                Text(
-                                    text = error,
-                                    color = colorScheme.onErrorContainer
-                                )
-                            }
-                            TextButton(onClick = onRefresh) {
-                                Text("Coba Lagi")
-                            }
                         }
                     }
                 }
