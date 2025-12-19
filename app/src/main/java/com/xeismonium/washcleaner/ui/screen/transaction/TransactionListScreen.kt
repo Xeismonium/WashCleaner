@@ -140,7 +140,27 @@ fun TransactionListContent(
             }
         },
         floatingActionButton = {
-
+            FloatingActionButton(
+                onClick = onAddTransaction,
+                containerColor = colorScheme.primary,
+                shape = CircleShape,
+                modifier = Modifier.size(56.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Tambah Transaksi",
+                    tint = colorScheme.onPrimary,
+                    modifier = Modifier.size(28.dp)
+                )
+            }
+        }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .background(colorScheme.background)
+        ) {
             // Filter Chips
             TransactionFilterChips(
                 selectedStatus = uiState.filterStatus,
@@ -242,8 +262,6 @@ fun TransactionListContent(
         }
     }
 }
-
-
 
 @Preview(showBackground = true)
 @Composable
