@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.xeismonium.washcleaner.ui.components.splash.SplashDetail
 import com.xeismonium.washcleaner.ui.navigation.Screen
 import com.xeismonium.washcleaner.ui.theme.WashCleanerTheme
 import kotlinx.coroutines.delay
@@ -34,18 +35,7 @@ fun SplashScreen(
     SplashDetail(uiState = uiState)
 }
 
-@Composable
-fun SplashDetail(uiState: SplashUiState) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = "WashCleaner",
-            style = MaterialTheme.typography.displayLarge
-        )
-    }
-}
+
 
 @Preview(showBackground = true)
 @Composable

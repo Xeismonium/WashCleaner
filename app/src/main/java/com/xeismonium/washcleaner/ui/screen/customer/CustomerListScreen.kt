@@ -52,6 +52,7 @@ import androidx.navigation.NavController
 import com.xeismonium.washcleaner.data.local.database.entity.CustomerEntity
 import com.xeismonium.washcleaner.ui.components.common.EmptyState
 import com.xeismonium.washcleaner.ui.components.common.SearchTopAppBar
+import com.xeismonium.washcleaner.ui.components.customer.CustomerListItem
 import com.xeismonium.washcleaner.ui.theme.WashCleanerTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -200,77 +201,7 @@ fun CustomerListContent(
     }
 }
 
-@Composable
-fun CustomerListItem(
-    customerWithCount: CustomerWithTransactionCount,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .heightIn(min = 72.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.weight(1f)
-        ) {
-            // Avatar with initial letter
-            Surface(
-                modifier = Modifier.size(48.dp),
-                shape = CircleShape,
-                color = MaterialTheme.colorScheme.primaryContainer
-            ) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Text(
-                        text = customerWithCount.customer.name.first().uppercase(),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                }
-            }
 
-            // Name and Phone
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = customerWithCount.customer.name,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = customerWithCount.customer.phone,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-        }
-
-        // Chevron icon
-        Icon(
-            imageVector = Icons.Default.ChevronRight,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-            modifier = Modifier.size(24.dp)
-        )
-    }
-}
 
 @Preview(showBackground = true)
 @Composable

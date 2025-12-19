@@ -56,7 +56,9 @@ sealed class NavigationItem(
             Dashboard,
             Transaction,
             Service,
-            Customer
+            Customer,
+            Report,
+            Settings
         )
 
         // All Navigation Items (including Report and Settings for drawer)

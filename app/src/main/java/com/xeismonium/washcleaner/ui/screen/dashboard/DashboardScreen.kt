@@ -82,15 +82,6 @@ fun DashboardContent(
                         )
                     }
                 },
-                navigationIcon = {
-                    IconButton(onClick = { /* TODO: Open Drawer */ }) {
-                        Icon(
-                            Icons.Default.Menu,
-                            contentDescription = "Menu",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                },
                 actions = {
                     IconButton(onClick = { /* TODO: Open Notifications */ }) {
                         Icon(
