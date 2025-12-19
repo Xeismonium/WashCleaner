@@ -61,7 +61,8 @@ import com.xeismonium.washcleaner.ui.components.common.WashCleanerScaffold
 @Composable
 fun CustomerListScreen(
     navController: NavController,
-    viewModel: CustomerViewModel = hiltViewModel()
+    viewModel: CustomerViewModel = hiltViewModel(),
+    onOpenDrawer: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val events by viewModel.events.collectAsState()
@@ -81,7 +82,7 @@ fun CustomerListScreen(
         onCustomerClick = { customerId -> navController.navigate("customer_form/$customerId") },
         onAddCustomer = { navController.navigate("customer_form/0") },
         onRefresh = { viewModel.refresh() },
-        onBackClick = { navController.popBackStack() }
+        onMenuClick = onOpenDrawer
     )
 }
 
@@ -93,11 +94,11 @@ fun CustomerListContent(
     onCustomerClick: (Long) -> Unit = {},
     onAddCustomer: () -> Unit = {},
     onRefresh: () -> Unit = {},
-    onBackClick: () -> Unit = {}
+    onMenuClick: () -> Unit = {}
 ) {
     WashCleanerScaffold(
         title = "Daftar Pelanggan",
-        onBackClick = onBackClick,
+        onMenuClick = onMenuClick,
         isLoading = uiState.isLoading,
         error = uiState.error,
         onRefresh = onRefresh,

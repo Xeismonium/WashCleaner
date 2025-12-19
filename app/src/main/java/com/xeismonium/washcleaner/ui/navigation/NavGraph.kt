@@ -23,7 +23,8 @@ import com.xeismonium.washcleaner.ui.screen.transaction.TransactionListScreen
 fun NavGraph(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    startDestination: String = Screen.Splash.route
+    startDestination: String = Screen.Splash.route,
+    onOpenDrawer: () -> Unit = {}
 ) {
     NavHost(
         navController = navController,
@@ -37,12 +38,12 @@ fun NavGraph(
 
         // 2. Dashboard / Home Screen
         composable(Screen.Dashboard.route) {
-            DashboardScreen(navController = navController)
+            DashboardScreen(navController = navController, onOpenDrawer = onOpenDrawer)
         }
 
         // 3. Daftar Transaksi Screen
         composable(Screen.TransactionList.route) {
-            TransactionListScreen(navController = navController)
+            TransactionListScreen(navController = navController, onOpenDrawer = onOpenDrawer)
         }
 
         // 4. Tambah / Edit Transaksi Screen
@@ -80,7 +81,7 @@ fun NavGraph(
 
         // 6. Daftar Layanan Screen
         composable(Screen.ServiceList.route) {
-            ServiceListScreen(navController = navController)
+            ServiceListScreen(navController = navController, onOpenDrawer = onOpenDrawer)
         }
 
         // 7. Tambah / Edit Layanan Screen
@@ -102,7 +103,7 @@ fun NavGraph(
 
         // 8. Daftar Pelanggan Screen
         composable(Screen.CustomerList.route) {
-            CustomerListScreen(navController = navController)
+            CustomerListScreen(navController = navController, onOpenDrawer = onOpenDrawer)
         }
 
         // 9. Tambah / Edit Pelanggan Screen
@@ -124,12 +125,12 @@ fun NavGraph(
 
         // 10. Laporan Screen
         composable(Screen.Report.route) {
-            ReportScreen(navController = navController)
+            ReportScreen(navController = navController, onOpenDrawer = onOpenDrawer)
         }
 
         // 11. Pengaturan Screen
         composable(Screen.Settings.route) {
-            SettingsScreen(navController = navController)
+            SettingsScreen(navController = navController, onOpenDrawer = onOpenDrawer)
         }
     }
 }

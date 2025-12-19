@@ -72,7 +72,8 @@ import com.xeismonium.washcleaner.ui.components.common.WashCleanerScaffold
 @Composable
 fun SettingsScreen(
     navController: NavController,
-    viewModel: SettingsViewModel = hiltViewModel()
+    viewModel: SettingsViewModel = hiltViewModel(),
+    onOpenDrawer: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val events by viewModel.events.collectAsState()
@@ -96,7 +97,7 @@ fun SettingsScreen(
         onRestoreJson = { showRestoreDialog = true },
         onRestoreDatabase = { showRestoreDialog = true },
         onClearMessage = viewModel::clearMessage,
-        onBackClick = { navController.popBackStack() }
+        onMenuClick = onOpenDrawer
     )
 
     if (showRestoreDialog) {
@@ -123,11 +124,11 @@ fun SettingsContent(
     onRestoreJson: () -> Unit = {},
     onRestoreDatabase: () -> Unit = {},
     onClearMessage: () -> Unit = {},
-    onBackClick: () -> Unit = {}
+    onMenuClick: () -> Unit = {}
 ) {
     WashCleanerScaffold(
         title = "Pengaturan",
-        onBackClick = onBackClick,
+        onMenuClick = onMenuClick,
         error = uiState.error,
         onRefresh = onClearMessage
     ) {

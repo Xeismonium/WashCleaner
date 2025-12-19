@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -38,6 +39,7 @@ import androidx.compose.ui.unit.dp
 fun WashCleanerScaffold(
     title: String,
     onBackClick: (() -> Unit)? = null,
+    onMenuClick: (() -> Unit)? = null,
     isLoading: Boolean = false,
     error: String? = null,
     onRefresh: () -> Unit = {},
@@ -77,6 +79,13 @@ fun WashCleanerScaffold(
                                     contentDescription = "Kembali"
                                 )
                             }
+                        } else if (onMenuClick != null) {
+                            IconButton(onClick = onMenuClick) {
+                                Icon(
+                                    imageVector = Icons.Default.Menu,
+                                    contentDescription = "Menu"
+                                )
+                            }
                         }
                     },
                     actions = {
@@ -108,7 +117,7 @@ fun WashCleanerScaffold(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(padding), // Ensure loader respects scaffold padding if needed
+                        .padding(padding),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator()

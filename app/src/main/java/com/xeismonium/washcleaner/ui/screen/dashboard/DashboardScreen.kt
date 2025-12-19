@@ -54,39 +54,19 @@ import kotlinx.coroutines.launch
 @Composable
 fun DashboardScreen(
     navController: NavController,
-    viewModel: DashboardViewModel = hiltViewModel()
+    viewModel: DashboardViewModel = hiltViewModel(),
+    onOpenDrawer: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            DrawerContent(
-                currentRoute = Screen.Dashboard.route,
-                onItemClick = { item ->
-                    scope.launch {
-                        drawerState.close()
-                        if (item.route != Screen.Dashboard.route) {
-                            navController.navigate(item.route)
-                        }
-                    }
-                }
-            )
-        }
-    ) {
-        DashboardContent(
-            uiState = uiState,
-            onOpenDrawer = {
-                scope.launch { drawerState.open() }
-            },
-            onNewTransaction = { navController.navigate("transaction_form/0") },
-            onViewAllTransactions = { navController.navigate("transaction_list") },
-            onNavigateToServices = { navController.navigate("service_list") },
-            onNavigateToCustomers = { navController.navigate("customer_list") }
-        )
-    }
+    DashboardContent(
+        uiState = uiState,
+        onOpenDrawer = onOpenDrawer,
+        onNewTransaction = { navController.navigate("transaction_form/0") },
+        onViewAllTransactions = { navController.navigate("transaction_list") },
+        onNavigateToServices = { navController.navigate("service_list") },
+        onNavigateToCustomers = { navController.navigate("customer_list") }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -119,15 +99,6 @@ fun DashboardContent(
                         Icon(
                             Icons.Default.Menu,
                             contentDescription = "Menu",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { /* TODO: Open Notifications */ }) {
-                        Icon(
-                            Icons.Default.Notifications,
-                            contentDescription = "Notifikasi",
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }

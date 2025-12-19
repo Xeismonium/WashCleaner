@@ -71,7 +71,8 @@ import com.xeismonium.washcleaner.ui.components.common.WashCleanerScaffold
 @Composable
 fun TransactionListScreen(
     navController: NavController,
-    viewModel: TransactionViewModel = hiltViewModel()
+    viewModel: TransactionViewModel = hiltViewModel(),
+    onOpenDrawer: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -82,7 +83,7 @@ fun TransactionListScreen(
         onTransactionClick = { id -> navController.navigate("transaction_detail/$id") },
         onAddTransaction = { navController.navigate("transaction_form/0") },
         onRefresh = { viewModel.refresh() },
-        onBackClick = { navController.popBackStack() }
+        onMenuClick = onOpenDrawer
     )
 }
 
@@ -95,13 +96,13 @@ fun TransactionListContent(
     onTransactionClick: (Long) -> Unit = {},
     onAddTransaction: () -> Unit = {},
     onRefresh: () -> Unit = {},
-    onBackClick: () -> Unit = {}
+    onMenuClick: () -> Unit = {}
 ) {
     val colorScheme = MaterialTheme.colorScheme
 
     WashCleanerScaffold(
         title = "Transaksi Laundry",
-        onBackClick = onBackClick,
+        onMenuClick = onMenuClick,
         isLoading = uiState.isLoading,
         error = uiState.error,
         onRefresh = onRefresh,

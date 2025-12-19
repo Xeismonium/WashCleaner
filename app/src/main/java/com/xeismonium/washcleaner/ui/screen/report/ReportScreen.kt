@@ -55,7 +55,8 @@ import com.xeismonium.washcleaner.ui.components.common.WashCleanerScaffold
 @Composable
 fun ReportScreen(
     navController: NavController,
-    viewModel: ReportViewModel = hiltViewModel()
+    viewModel: ReportViewModel = hiltViewModel(),
+    onOpenDrawer: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -63,8 +64,8 @@ fun ReportScreen(
         uiState = uiState,
         onPeriodChange = { period -> viewModel.changePeriod(period) },
         onRefresh = { viewModel.refresh() },
-        onBackClick = { navController.popBackStack() },
-        onDownloadClick = { /* TODO: Implement download */ }
+        onDownloadClick = { /* TODO: Implement download */ },
+        onMenuClick = onOpenDrawer
     )
 }
 
@@ -74,14 +75,14 @@ fun ReportContent(
     uiState: ReportUiState,
     onPeriodChange: (String) -> Unit = {},
     onRefresh: () -> Unit = {},
-    onBackClick: () -> Unit = {},
-    onDownloadClick: () -> Unit = {}
+    onDownloadClick: () -> Unit = {},
+    onMenuClick: () -> Unit = {}
 ) {
     val formatter = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
 
     WashCleanerScaffold(
         title = "Laporan Pendapatan",
-        onBackClick = onBackClick,
+        onMenuClick = onMenuClick,
         isLoading = uiState.isLoading,
         error = uiState.error,
         onRefresh = onRefresh

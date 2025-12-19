@@ -53,7 +53,8 @@ import com.xeismonium.washcleaner.ui.components.common.WashCleanerScaffold
 @Composable
 fun ServiceListScreen(
     navController: NavController,
-    viewModel: ServiceViewModel = hiltViewModel()
+    viewModel: ServiceViewModel = hiltViewModel(),
+    onOpenDrawer: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val events by viewModel.events.collectAsState()
@@ -74,7 +75,7 @@ fun ServiceListScreen(
         onToggleStatus = { service -> viewModel.toggleServiceStatus(service) },
         onAddService = { navController.navigate("service_form/0") },
         onRefresh = { viewModel.refresh() },
-        onBackClick = { navController.popBackStack() }
+        onMenuClick = onOpenDrawer
     )
 }
 
@@ -87,11 +88,11 @@ fun ServiceListContent(
     onToggleStatus: (ServiceEntity) -> Unit = {},
     onAddService: () -> Unit = {},
     onRefresh: () -> Unit = {},
-    onBackClick: () -> Unit = {}
+    onMenuClick: () -> Unit = {}
 ) {
     WashCleanerScaffold(
         title = "Daftar Layanan",
-        onBackClick = onBackClick,
+        onMenuClick = onMenuClick,
         isLoading = uiState.isLoading,
         error = uiState.error,
         onRefresh = onRefresh,
