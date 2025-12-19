@@ -15,26 +15,8 @@ import com.xeismonium.washcleaner.ui.navigation.Screen
 import com.xeismonium.washcleaner.ui.screen.settings.SettingsViewModel
 
 @Composable
-fun WashCleanerApp(
-    settingsViewModel: SettingsViewModel = hiltViewModel()
-) {
+fun WashCleanerApp() {
     val navController = rememberNavController()
-    val uiState by settingsViewModel.uiState.collectAsState()
-
-    // Restore last screen route
-    LaunchedEffect(uiState.lastScreenRoute) {
-        val lastRoute = uiState.lastScreenRoute
-        if (lastRoute != null && lastRoute != Screen.Dashboard.route) {
-            // Check if we are already there to avoid loop or unnecessary navigation
-            val currentRoute = navController.currentBackStackEntry?.destination?.route
-            if (currentRoute != lastRoute) {
-                 // We want to push it on top of Dashboard so Back works
-                 navController.navigate(lastRoute) {
-                     launchSingleTop = true
-                 }
-            }
-        }
-    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),

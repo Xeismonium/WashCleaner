@@ -54,8 +54,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun DashboardScreen(
     navController: NavController,
-    viewModel: DashboardViewModel = hiltViewModel(),
-    settingsViewModel: SettingsViewModel = hiltViewModel()
+    viewModel: DashboardViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -69,7 +68,6 @@ fun DashboardScreen(
                 onItemClick = { item ->
                     scope.launch {
                         drawerState.close()
-                        settingsViewModel.setLastScreenRoute(item.route)
                         if (item.route != Screen.Dashboard.route) {
                             navController.navigate(item.route)
                         }

@@ -19,7 +19,6 @@ enum class ThemeMode {
 data class SettingsUiState(
     val appVersion: String = "1.0.0",
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
-    val lastScreenRoute: String? = null,
     val isBackingUp: Boolean = false,
     val isRestoring: Boolean = false,
     val error: String? = null,
@@ -45,20 +44,13 @@ class SettingsViewModel @Inject constructor(
     val events: StateFlow<SettingsEvent?> = _events.asStateFlow()
 
     init {
-        observePreferences()
+        observeThemeMode()
     }
 
-    private fun observePreferences() {
+    private fun observeThemeMode() {
         viewModelScope.launch {
-            launch {
-                userPreferencesRepository.themeMode.collect { mode ->
-                    _uiState.value = _uiState.value.copy(themeMode = mode)
-                }
-            }
-            launch {
-                userPreferencesRepository.lastScreenRoute.collect { route ->
-                    _uiState.value = _uiState.value.copy(lastScreenRoute = route)
-                }
+            userPreferencesRepository.themeMode.collect { mode ->
+                _uiState.value = _uiState.value.copy(themeMode = mode)
             }
         }
     }
@@ -69,16 +61,6 @@ class SettingsViewModel @Inject constructor(
                 userPreferencesRepository.setThemeMode(mode)
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(error = e.message)
-            }
-        }
-    }
-
-    fun setLastScreenRoute(route: String) {
-        viewModelScope.launch {
-            try {
-                userPreferencesRepository.setLastScreenRoute(route)
-            } catch (e: Exception) {
-                // Ignore error for non-critical preference
             }
         }
     }
