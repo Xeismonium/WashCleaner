@@ -127,6 +127,7 @@ fun TransactionDetailContent(
     val dateFormatter = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale("id", "ID"))
 
     val statusColor = when (transaction.transaction.status.lowercase()) {
+        "baru" -> MaterialTheme.colorScheme.tertiary
         "proses" -> StatusProcessing
         "siap" -> StatusReady
         "selesai" -> StatusCompleted
@@ -134,6 +135,7 @@ fun TransactionDetailContent(
     }
 
     val statusLabel = when (transaction.transaction.status.lowercase()) {
+        "baru" -> "Baru"
         "proses" -> "Diproses"
         "siap" -> "Siap Diambil"
         "selesai" -> "Selesai"

@@ -155,7 +155,7 @@ fun TransactionFormScreen(
                         customerName = customerName,
                         services = serviceItems,
                         status = status,
-                        dateOut = if (status == "diambil") System.currentTimeMillis() else null
+                        dateOut = if (status == "selesai") System.currentTimeMillis() else null
                     )
                 }
             }
