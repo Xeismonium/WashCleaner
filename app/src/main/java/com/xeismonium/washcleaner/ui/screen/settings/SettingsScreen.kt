@@ -5,7 +5,6 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -87,23 +86,15 @@ fun SettingsScreen(
         }
     }
 
-    val darkTheme = when (uiState.themeMode) {
-        ThemeMode.LIGHT -> false
-        ThemeMode.DARK -> true
-        ThemeMode.SYSTEM -> isSystemInDarkTheme()
-    }
-
-    WashCleanerTheme(darkTheme = darkTheme) {
-        SettingsContent(
-            uiState = uiState,
-            onThemeModeChange = viewModel::setThemeMode,
-            onBackupJson = viewModel::backupDataAsJson,
-            onBackupDatabase = viewModel::backupDataAsDatabase,
-            onRestoreJson = { showRestoreDialog = true },
-            onRestoreDatabase = { showRestoreDialog = true },
-            onClearMessage = viewModel::clearMessage
-        )
-    }
+    SettingsContent(
+        uiState = uiState,
+        onThemeModeChange = viewModel::setThemeMode,
+        onBackupJson = viewModel::backupDataAsJson,
+        onBackupDatabase = viewModel::backupDataAsDatabase,
+        onRestoreJson = { showRestoreDialog = true },
+        onRestoreDatabase = { showRestoreDialog = true },
+        onClearMessage = viewModel::clearMessage
+    )
 
     if (showRestoreDialog) {
         AlertDialog(

@@ -30,9 +30,12 @@ sealed class SettingsEvent {
     data class Error(val message: String) : SettingsEvent()
 }
 
+import com.xeismonium.washcleaner.data.local.datastore.UserPreferencesRepository
+
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsUiState())
@@ -42,17 +45,13 @@ class SettingsViewModel @Inject constructor(
     val events: StateFlow<SettingsEvent?> = _events.asStateFlow()
 
     init {
-        loadThemePreference()
+        observeThemeMode()
     }
 
-    private fun loadThemePreference() {
+    private fun observeThemeMode() {
         viewModelScope.launch {
-            try {
-                // In a real implementation, load from DataStore
-                // For now, default to SYSTEM
-                _uiState.value = _uiState.value.copy(themeMode = ThemeMode.SYSTEM)
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(error = e.message)
+            userPreferencesRepository.themeMode.collect { mode ->
+                _uiState.value = _uiState.value.copy(themeMode = mode)
             }
         }
     }
@@ -60,8 +59,7 @@ class SettingsViewModel @Inject constructor(
     fun setThemeMode(mode: ThemeMode) {
         viewModelScope.launch {
             try {
-                // In a real implementation, save to DataStore
-                _uiState.value = _uiState.value.copy(themeMode = mode)
+                userPreferencesRepository.setThemeMode(mode)
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(error = e.message)
             }
