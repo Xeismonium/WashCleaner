@@ -48,6 +48,11 @@ import com.xeismonium.washcleaner.ui.components.report.SummaryCard
 import com.xeismonium.washcleaner.ui.theme.WashCleanerTheme
 import java.text.NumberFormat
 import java.util.Locale
+import android.content.ContentValues
+import android.os.Environment
+import android.provider.MediaStore
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 
 import com.xeismonium.washcleaner.ui.components.common.WashCleanerScaffold
 
@@ -59,12 +64,40 @@ fun ReportScreen(
     onOpenDrawer: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
 
     ReportContent(
         uiState = uiState,
         onPeriodChange = { period -> viewModel.changePeriod(period) },
         onRefresh = { viewModel.refresh() },
-        onDownloadClick = { /* TODO: Implement download */ },
+        onDownloadClick = {
+            try {
+                val csvContent = viewModel.generateCsvContent()
+                val timestamp = System.currentTimeMillis()
+                val filename = "Laporan_WashCleaner_$timestamp.csv"
+                
+                val contentValues = ContentValues().apply {
+                    put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
+                    put(MediaStore.MediaColumns.MIME_TYPE, "text/csv")
+                    put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+                }
+                
+                val resolver = context.contentResolver
+                val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+                
+                if (uri != null) {
+                    resolver.openOutputStream(uri)?.use { outputStream ->
+                        outputStream.write(csvContent.toByteArray())
+                    }
+                    Toast.makeText(context, "Laporan disimpan di Downloads", Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(context, "Gagal menyimpan laporan", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Toast.makeText(context, "Terjadi kesalahan: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        },
         onMenuClick = onOpenDrawer
     )
 }

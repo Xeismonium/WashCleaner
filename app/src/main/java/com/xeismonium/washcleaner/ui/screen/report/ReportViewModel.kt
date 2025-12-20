@@ -55,6 +55,7 @@ data class ReportUiState(
     val servicePopularityData: List<ServicePopularityData> = emptyList(),
     val topCustomersData: List<TopCustomerData> = emptyList(),
     val statusStatisticsData: List<StatusStatisticsData> = emptyList(),
+    val transactionList: List<com.xeismonium.washcleaner.data.local.database.entity.LaundryTransactionEntity> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null,
     val selectedPeriod: String = "day" // day, week, month
@@ -127,6 +128,7 @@ class ReportViewModel @Inject constructor(
                             averageTransactionValue = average,
                             trendPercentage = trendPercentage,
                             chartData = chartData,
+                            transactionList = filteredTransactions,
                             isLoading = false,
                             error = null
                         )
@@ -138,6 +140,32 @@ class ReportViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    fun generateCsvContent(): String {
+        val transactions = _uiState.value.transactionList
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        val csvBuilder = StringBuilder()
+        
+        // Header
+        csvBuilder.append("ID,Pelanggan,Tanggal Masuk,Tanggal Keluar,Status,Total Harga\n")
+        
+        // Data
+        transactions.forEach { transaction ->
+            val dateIn = dateFormat.format(Date(transaction.dateIn))
+            val dateOut = if (transaction.dateOut != null) dateFormat.format(Date(transaction.dateOut)) else "-"
+            
+            csvBuilder.append(
+                "${transaction.id}," +
+                "\"${transaction.customerName ?: "Tanpa Nama"}\"," +
+                "\"$dateIn\"," +
+                "\"$dateOut\"," +
+                "\"${transaction.status}\"," +
+                "${transaction.totalPrice}\n"
+            )
+        }
+        
+        return csvBuilder.toString()
     }
 
     private fun getDateRange(period: String): Pair<Long, Long> {
