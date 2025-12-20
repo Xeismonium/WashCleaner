@@ -43,6 +43,7 @@ import com.xeismonium.washcleaner.data.local.database.entity.LaundryTransactionE
 import com.xeismonium.washcleaner.ui.components.common.StatusBadge
 import com.xeismonium.washcleaner.ui.theme.StatusCancelled
 import com.xeismonium.washcleaner.ui.theme.StatusCompleted
+import com.xeismonium.washcleaner.ui.theme.StatusNew
 import com.xeismonium.washcleaner.ui.theme.StatusProcessing
 import com.xeismonium.washcleaner.ui.theme.StatusReady
 import java.text.NumberFormat
@@ -67,6 +68,7 @@ fun TransactionCard(
     )
 
     val statusColor = when (transaction.status.lowercase()) {
+        "baru" -> StatusNew
         "proses" -> StatusProcessing
         "siap" -> StatusReady
         "selesai" -> StatusCompleted

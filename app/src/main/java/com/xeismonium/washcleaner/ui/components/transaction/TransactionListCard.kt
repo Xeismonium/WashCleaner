@@ -13,7 +13,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.xeismonium.washcleaner.data.local.database.entity.LaundryTransactionEntity
+import com.xeismonium.washcleaner.ui.components.common.StatusBadge
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -34,24 +34,6 @@ fun TransactionListCard(
     val colorScheme = MaterialTheme.colorScheme
     val formatter = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
     val dateFormatter = SimpleDateFormat("dd MMM yyyy", Locale("id", "ID"))
-
-    val statusColor = when (transaction.status.lowercase()) {
-        "selesai", "diambil" -> colorScheme.tertiary
-        "baru" -> colorScheme.secondary
-        else -> colorScheme.secondary // proses, diproses
-    }
-    val statusBgColor = when (transaction.status.lowercase()) {
-        "selesai", "diambil" -> colorScheme.tertiaryContainer
-        "baru" -> colorScheme.secondaryContainer
-        else -> colorScheme.secondaryContainer
-    }
-    val statusText = when (transaction.status.lowercase()) {
-        "baru" -> "Baru"
-        "proses", "diproses" -> "Proses"
-        "selesai" -> "Selesai"
-        "diambil" -> "Diambil"
-        else -> transaction.status.replaceFirstChar { it.uppercase() }
-    }
 
     Card(
         modifier = Modifier
@@ -83,23 +65,12 @@ fun TransactionListCard(
                     }
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Cuci Kering Setrika", // Placeholder - would come from services
+                        text = "Laundry",
                         style = MaterialTheme.typography.bodyMedium,
                         color = colorScheme.onSurfaceVariant
                     )
                 }
-                Surface(
-                    shape = RoundedCornerShape(50),
-                    color = statusBgColor
-                ) {
-                    Text(
-                        text = statusText,
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        color = statusColor,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
-                    )
-                }
+                StatusBadge(status = transaction.status, showIcon = false)
             }
 
             // Divider

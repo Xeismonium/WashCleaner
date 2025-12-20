@@ -47,6 +47,7 @@ import com.xeismonium.washcleaner.ui.components.transaction.ServiceCard
 import com.xeismonium.washcleaner.ui.components.transaction.StatusUpdateDialog
 import com.xeismonium.washcleaner.ui.theme.StatusCancelled
 import com.xeismonium.washcleaner.ui.theme.StatusCompleted
+import com.xeismonium.washcleaner.ui.theme.StatusNew
 import com.xeismonium.washcleaner.ui.theme.StatusProcessing
 import com.xeismonium.washcleaner.ui.theme.StatusReady
 import com.xeismonium.washcleaner.ui.theme.WashCleanerTheme
@@ -127,7 +128,7 @@ fun TransactionDetailContent(
     val dateFormatter = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale("id", "ID"))
 
     val statusColor = when (transaction.transaction.status.lowercase()) {
-        "baru" -> MaterialTheme.colorScheme.tertiary
+        "baru" -> StatusNew
         "proses" -> StatusProcessing
         "siap" -> StatusReady
         "selesai" -> StatusCompleted

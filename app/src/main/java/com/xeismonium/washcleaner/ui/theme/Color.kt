@@ -12,6 +12,7 @@ val LightBG = Color(0xFFF5F7F8)
 val DarkBG = Color(0xFF101922)
 
 // Status colors
+val StatusNew = Color(0xFF9C27B0) // Purple
 val StatusProcessing = Color(0xFFFF9800) // Orange
 val StatusCompleted = Color(0xFF4CAF50) // Green
 val StatusReady = Color(0xFF2196F3) // Blue

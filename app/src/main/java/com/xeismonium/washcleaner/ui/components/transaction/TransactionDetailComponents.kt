@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.FiberNew
 import androidx.compose.material.icons.filled.HourglassTop
 import androidx.compose.material.icons.filled.Inventory
 import androidx.compose.material.icons.filled.LocalLaundryService
@@ -53,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.xeismonium.washcleaner.ui.theme.StatusCancelled
 import com.xeismonium.washcleaner.ui.theme.StatusCompleted
+import com.xeismonium.washcleaner.ui.theme.StatusNew
 import com.xeismonium.washcleaner.ui.theme.StatusProcessing
 import com.xeismonium.washcleaner.ui.theme.StatusReady
 import java.text.NumberFormat
@@ -499,6 +501,15 @@ fun StatusUpdateDialog(
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
+
+                StatusOption(
+                    label = "Baru",
+                    description = "Pesanan baru diterima",
+                    icon = Icons.Default.FiberNew,
+                    color = StatusNew,
+                    selected = selectedStatus == "baru",
+                    onClick = { selectedStatus = "baru" }
+                )
 
                 StatusOption(
                     label = "Proses",

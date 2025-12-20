@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.FiberNew
 import androidx.compose.material.icons.filled.Inventory
 import androidx.compose.material.icons.filled.LocalLaundryService
 import androidx.compose.material3.Icon
@@ -22,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.xeismonium.washcleaner.ui.theme.StatusCancelled
 import com.xeismonium.washcleaner.ui.theme.StatusCompleted
+import com.xeismonium.washcleaner.ui.theme.StatusNew
 import com.xeismonium.washcleaner.ui.theme.StatusProcessing
 import com.xeismonium.washcleaner.ui.theme.StatusReady
 
@@ -31,6 +33,12 @@ fun StatusBadge(
     showIcon: Boolean = true
 ) {
     val (backgroundColor, textColor, text, icon) = when (status.lowercase()) {
+        "baru" -> StatusData(
+            StatusNew.copy(alpha = 0.15f),
+            StatusNew,
+            "Baru",
+            Icons.Default.FiberNew
+        )
         "proses" -> StatusData(
             StatusProcessing.copy(alpha = 0.15f),
             StatusProcessing,

@@ -26,8 +26,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.xeismonium.washcleaner.ui.theme.StatusCompleted
+import com.xeismonium.washcleaner.ui.theme.StatusNew
 import com.xeismonium.washcleaner.ui.theme.StatusProcessing
 import com.xeismonium.washcleaner.ui.theme.StatusReady
+import androidx.compose.material.icons.filled.FiberNew
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,6 +51,15 @@ fun FilterChips(
             label = "Semua",
             icon = Icons.Default.AllInclusive,
             selectedColor = MaterialTheme.colorScheme.primary
+        )
+
+        // New filter
+        ModernFilterChip(
+            selected = selectedStatus == "baru",
+            onClick = { onStatusSelected("baru") },
+            label = "Baru",
+            icon = Icons.Default.FiberNew,
+            selectedColor = StatusNew
         )
 
         // Process filter
