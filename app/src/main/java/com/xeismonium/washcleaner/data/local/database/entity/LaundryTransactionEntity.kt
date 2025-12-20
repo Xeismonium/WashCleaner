@@ -32,6 +32,8 @@ data class LaundryTransactionEntity(
 
     val dateIn: Long,
     val dateOut: Long?,
+    val estimatedDate: Long?,
 
-    val status: String
+    val status: String,
+    val isPaid: Boolean = false
 )

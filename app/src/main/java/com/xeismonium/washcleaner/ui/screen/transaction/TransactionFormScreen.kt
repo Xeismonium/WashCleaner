@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,6 +25,8 @@ import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -64,6 +65,7 @@ import com.xeismonium.washcleaner.ui.theme.WashCleanerTheme
 import com.xeismonium.washcleaner.util.CurrencyUtils
 import java.text.SimpleDateFormat
 import java.util.Locale
+import androidx.compose.foundation.clickable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -97,7 +99,7 @@ fun TransactionFormScreen(
         initialTransaction = uiState.selectedTransaction,
         customers = uiState.customers,
         services = uiState.services,
-        onSave = { customerId, customerName, serviceRows, dateIn, estimatedDate, status ->
+        onSave = { customerId, customerName, serviceRows, dateIn, estimatedDate, status, isPaid ->
             val serviceItems = serviceRows.mapNotNull { row ->
                 row.serviceId?.let { serviceId ->
                     val weight = row.weightKg.toDoubleOrNull() ?: 0.0
@@ -117,7 +119,10 @@ fun TransactionFormScreen(
                         customerId = customerId,
                         customerName = customerName,
                         services = serviceItems,
-                        status = status
+                        status = status,
+                        dateIn = dateIn ?: System.currentTimeMillis(),
+                        estimatedDate = estimatedDate,
+                        isPaid = isPaid
                     )
                 } else {
                     viewModel.updateTransactionWithServices(
@@ -126,7 +131,10 @@ fun TransactionFormScreen(
                         customerName = customerName,
                         services = serviceItems,
                         status = status,
-                        dateOut = if (status == "selesai") System.currentTimeMillis() else null
+                        dateOut = if (status == "selesai") System.currentTimeMillis() else null,
+                        dateIn = dateIn ?: System.currentTimeMillis(),
+                        estimatedDate = estimatedDate,
+                        isPaid = isPaid
                     )
                 }
             }
@@ -143,7 +151,7 @@ fun TransactionFormContent(
     initialTransaction: TransactionWithServices? = null,
     customers: List<CustomerEntity> = emptyList(),
     services: List<ServiceEntity> = emptyList(),
-    onSave: (Long?, String?, List<ServiceRow>, Long?, Long?, String) -> Unit = { _, _, _, _, _, _ -> },
+    onSave: (Long?, String?, List<ServiceRow>, Long?, Long?, String, Boolean) -> Unit = { _, _, _, _, _, _, _ -> },
     onCancel: () -> Unit = {},
     error: String? = null
 ) {
@@ -153,13 +161,16 @@ fun TransactionFormContent(
     var dateIn by remember { mutableStateOf<Long?>(System.currentTimeMillis()) }
     var estimatedDate by remember { mutableStateOf<Long?>(null) }
     var selectedStatus by remember { mutableStateOf("baru") }
+    var isPaid by remember { mutableStateOf(false) }
 
     LaunchedEffect(initialTransaction) {
         initialTransaction?.let { tx ->
             selectedCustomerId = tx.transaction.customerId
             customerName = tx.transaction.customerName ?: ""
             dateIn = tx.transaction.dateIn
+            estimatedDate = tx.transaction.estimatedDate
             selectedStatus = tx.transaction.status
+            isPaid = tx.transaction.isPaid
 
             if (tx.transactionServices.isNotEmpty()) {
                 serviceRows = tx.transactionServices.map { item ->
@@ -255,7 +266,8 @@ fun TransactionFormContent(
                                 serviceRows,
                                 dateIn,
                                 estimatedDate,
-                                selectedStatus
+                                selectedStatus,
+                                isPaid
                             )
                         }
                     )
@@ -433,7 +445,30 @@ fun TransactionFormContent(
                 )
             }
 
-            Spacer(modifier = Modifier.height(100.dp))
+            // Payment Status
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { isPaid = !isPaid }
+                    .padding(vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Checkbox(
+                    checked = isPaid,
+                    onCheckedChange = { isPaid = it },
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = MaterialTheme.colorScheme.primary
+                    )
+                )
+                Text(
+                    text = "Sudah Dibayar (Lunas)",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+
+            Spacer(modifier = Modifier.padding(top = 100.dp))
         }
     }
 }

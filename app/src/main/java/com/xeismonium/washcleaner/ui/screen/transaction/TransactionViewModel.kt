@@ -136,7 +136,10 @@ class TransactionViewModel @Inject constructor(
         customerId: Long?,
         customerName: String?,
         services: List<TransactionWithServicesData.ServiceItem>,
-        status: String = "proses"
+        status: String = "proses",
+        dateIn: Long = System.currentTimeMillis(),
+        estimatedDate: Long? = null,
+        isPaid: Boolean = false
     ) {
         viewModelScope.launch {
             try {
@@ -146,9 +149,11 @@ class TransactionViewModel @Inject constructor(
                     customerId = customerId,
                     customerName = customerName,
                     totalPrice = totalPrice,
-                    dateIn = System.currentTimeMillis(),
+                    dateIn = dateIn,
                     dateOut = null,
-                    status = status
+                    estimatedDate = estimatedDate,
+                    status = status,
+                    isPaid = isPaid
                 )
 
                 val data = TransactionWithServicesData(
@@ -171,7 +176,10 @@ class TransactionViewModel @Inject constructor(
         customerName: String?,
         services: List<TransactionWithServicesData.ServiceItem>,
         status: String,
-        dateOut: Long?
+        dateOut: Long?,
+        dateIn: Long,
+        estimatedDate: Long?,
+        isPaid: Boolean
     ) {
         viewModelScope.launch {
             try {
@@ -182,9 +190,11 @@ class TransactionViewModel @Inject constructor(
                     customerId = customerId,
                     customerName = customerName,
                     totalPrice = totalPrice,
-                    dateIn = System.currentTimeMillis(), // This will be ignored on update
+                    dateIn = dateIn,
                     dateOut = dateOut,
-                    status = status
+                    estimatedDate = estimatedDate,
+                    status = status,
+                    isPaid = isPaid
                 )
 
                 val data = TransactionWithServicesData(

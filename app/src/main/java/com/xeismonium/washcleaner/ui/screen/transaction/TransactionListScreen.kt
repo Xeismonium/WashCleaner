@@ -194,6 +194,7 @@ fun TransactionListPreview() {
                         totalPrice = 50000.0,
                         dateIn = System.currentTimeMillis(),
                         dateOut = null,
+                        estimatedDate = System.currentTimeMillis() + 86400000,
                         status = "proses"
                     ),
                     LaundryTransactionEntity(
@@ -203,6 +204,7 @@ fun TransactionListPreview() {
                         totalPrice = 75000.0,
                         dateIn = System.currentTimeMillis() - 3600000,
                         dateOut = System.currentTimeMillis(),
+                        estimatedDate = System.currentTimeMillis(),
                         status = "selesai"
                     ),
                     LaundryTransactionEntity(
@@ -212,6 +214,7 @@ fun TransactionListPreview() {
                         totalPrice = 60000.0,
                         dateIn = System.currentTimeMillis() - 7200000,
                         dateOut = null,
+                        estimatedDate = System.currentTimeMillis() + 172800000,
                         status = "siap"
                     )
                 ),

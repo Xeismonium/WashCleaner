@@ -271,6 +271,7 @@ fun TransactionDetailPreview() {
                     totalPrice = 125000.0,
                     dateIn = System.currentTimeMillis(),
                     dateOut = null,
+                    estimatedDate = System.currentTimeMillis() + 86400000,
                     status = "proses"
                 ),
                 transactionServices = listOf(
