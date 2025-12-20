@@ -32,7 +32,7 @@ fun TransactionListCard(
     onClick: () -> Unit
 ) {
     val colorScheme = MaterialTheme.colorScheme
-    val dateFormatter = SimpleDateFormat("dd MMM yyyy", Locale("id", "ID"))
+    val dateFormatter = SimpleDateFormat("dd MMM yyyy", Locale.forLanguageTag("id-ID"))
 
     Card(
         modifier = Modifier

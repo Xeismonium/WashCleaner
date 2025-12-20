@@ -5,7 +5,7 @@ import java.util.Locale
 
 object CurrencyUtils {
     fun formatRupiah(amount: Double): String {
-        val formatter = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
+        val formatter = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("id-ID"))
         formatter.maximumFractionDigits = 0
         return formatter.format(amount)
     }

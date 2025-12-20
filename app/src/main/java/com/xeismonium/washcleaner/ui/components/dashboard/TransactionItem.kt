@@ -25,7 +25,7 @@ fun TransactionItem(
     transaction: LaundryTransactionEntity,
     onClick: () -> Unit
 ) {
-    val dateFormatter = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale("id", "ID"))
+    val dateFormatter = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.forLanguageTag("id-ID"))
 
     Card(
         onClick = onClick,

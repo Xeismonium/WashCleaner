@@ -48,7 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.xeismonium.washcleaner.data.local.database.entity.CustomerEntity
 import com.xeismonium.washcleaner.data.local.database.entity.ServiceEntity
@@ -185,7 +185,7 @@ fun TransactionFormContent(
     }
 
     val totalPrice = serviceRows.sumOf { it.subtotal }
-    val dateFormatter = remember { SimpleDateFormat("dd/MM/yyyy", Locale("id", "ID")) }
+    val dateFormatter = remember { SimpleDateFormat("dd/MM/yyyy", Locale.forLanguageTag("id-ID")) }
 
     val isFormValid = customerName.isNotBlank() && serviceRows.any {
         it.serviceId != null && it.weightKg.toDoubleOrNull() != null && it.weightKg.toDouble() > 0
@@ -208,7 +208,7 @@ fun TransactionFormContent(
                         )
                     }
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
                     titleContentColor = MaterialTheme.colorScheme.onBackground,
                     navigationIconContentColor = MaterialTheme.colorScheme.onBackground

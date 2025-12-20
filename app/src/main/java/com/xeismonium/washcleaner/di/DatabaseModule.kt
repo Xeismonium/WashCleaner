@@ -27,7 +27,7 @@ object DatabaseModule {
             context,
             WashCleanerDatabase::class.java,
             "wash_cleaner_database"
-        ).fallbackToDestructiveMigration()
+        ).fallbackToDestructiveMigration(true)
             .build()
     }
 

@@ -17,7 +17,7 @@ import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.LocalLaundryService
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.ReceiptLong
+import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -211,19 +211,19 @@ fun DashboardContent(
                     DashboardStatCard(
                         title = "Transaksi Hari Ini",
                         value = uiState.todayTransactions.toString(),
-                        icon = Icons.Default.ReceiptLong,
+                        icon = Icons.AutoMirrored.Filled.ReceiptLong,
                         iconTint = MaterialTheme.colorScheme.primary
                     )
                     DashboardStatCard(
                         title = "Sedang Diproses",
                         value = uiState.processingCount.toString(),
-                        icon = Icons.Default.ReceiptLong,
+                        icon = Icons.AutoMirrored.Filled.ReceiptLong,
                         iconTint = StatusProcessing
                     )
                     DashboardStatCard(
                         title = "Siap Diambil",
                         value = uiState.readyCount.toString(),
-                        icon = Icons.Default.ReceiptLong,
+                        icon = Icons.AutoMirrored.Filled.ReceiptLong,
                         iconTint = StatusCompleted
                     )
                 }

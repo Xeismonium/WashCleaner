@@ -263,7 +263,7 @@ class ReportViewModel @Inject constructor(
             "day" -> {
                 // Group by hour intervals (e.g., 08:00, 12:00, 16:00, 20:00)
                 val hourIntervals = listOf(8, 12, 16, 20)
-                val hourFormat = SimpleDateFormat("HH", Locale("id", "ID"))
+                val hourFormat = SimpleDateFormat("HH", Locale.forLanguageTag("id-ID"))
 
                 val grouped = completedTransactions.groupBy { transaction ->
                     val hour = hourFormat.format(Date(transaction.dateIn)).toIntOrNull() ?: 0
@@ -283,7 +283,7 @@ class ReportViewModel @Inject constructor(
             }
             "week" -> {
                 // Group by day of week
-                val dayFormat = SimpleDateFormat("EEE", Locale("id", "ID"))
+                val dayFormat = SimpleDateFormat("EEE", Locale.forLanguageTag("id-ID"))
                 val calendar = Calendar.getInstance()
 
                 val grouped = completedTransactions.groupBy { transaction ->
@@ -338,11 +338,11 @@ class ReportViewModel @Inject constructor(
     private suspend fun loadRevenueData(transactions: List<com.xeismonium.washcleaner.data.local.database.entity.LaundryTransactionEntity>) {
         val period = _uiState.value.selectedPeriod
         val dateFormat = when (period) {
-            "day" -> SimpleDateFormat("dd MMM", Locale("id", "ID"))
-            "week" -> SimpleDateFormat("dd MMM", Locale("id", "ID"))
-            "month" -> SimpleDateFormat("MMM yyyy", Locale("id", "ID"))
-            "year" -> SimpleDateFormat("yyyy", Locale("id", "ID"))
-            else -> SimpleDateFormat("dd MMM", Locale("id", "ID"))
+            "day" -> SimpleDateFormat("dd MMM", Locale.forLanguageTag("id-ID"))
+            "week" -> SimpleDateFormat("dd MMM", Locale.forLanguageTag("id-ID"))
+            "month" -> SimpleDateFormat("MMM yyyy", Locale.forLanguageTag("id-ID"))
+            "year" -> SimpleDateFormat("yyyy", Locale.forLanguageTag("id-ID"))
+            else -> SimpleDateFormat("dd MMM", Locale.forLanguageTag("id-ID"))
         }
 
         val completedTransactions = transactions.filter { it.status == "selesai" }

@@ -35,7 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.xeismonium.washcleaner.data.local.database.entity.LaundryTransactionEntity
 import com.xeismonium.washcleaner.data.local.database.entity.ServiceEntity
@@ -142,7 +142,7 @@ fun TransactionDetailContent(
     onDelete: () -> Unit = {},
     onStatusChange: () -> Unit = {}
 ) {
-    val dateFormatter = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale("id", "ID"))
+    val dateFormatter = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.forLanguageTag("id-ID"))
 
     val statusColor = when (transaction.transaction.status.lowercase()) {
         "baru" -> StatusNew

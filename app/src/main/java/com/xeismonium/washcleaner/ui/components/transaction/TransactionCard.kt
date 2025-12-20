@@ -56,8 +56,8 @@ fun TransactionCard(
     transaction: LaundryTransactionEntity,
     onClick: () -> Unit
 ) {
-    val dateFormatter = SimpleDateFormat("dd MMM yyyy", Locale("id", "ID"))
-    val timeFormatter = SimpleDateFormat("HH:mm", Locale("id", "ID"))
+    val dateFormatter = SimpleDateFormat("dd MMM yyyy", Locale.forLanguageTag("id-ID"))
+    val timeFormatter = SimpleDateFormat("HH:mm", Locale.forLanguageTag("id-ID"))
 
     var isPressed by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(
