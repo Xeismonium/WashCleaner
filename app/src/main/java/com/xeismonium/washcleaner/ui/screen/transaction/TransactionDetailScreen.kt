@@ -1,6 +1,7 @@
 package com.xeismonium.washcleaner.ui.screen.transaction
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -51,7 +54,7 @@ import com.xeismonium.washcleaner.ui.theme.StatusNew
 import com.xeismonium.washcleaner.ui.theme.StatusProcessing
 import com.xeismonium.washcleaner.ui.theme.StatusReady
 import com.xeismonium.washcleaner.ui.theme.WashCleanerTheme
-import java.text.NumberFormat
+import com.xeismonium.washcleaner.util.CurrencyUtils
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -81,7 +84,22 @@ fun TransactionDetailScreen(
         }
     }
 
-    uiState.selectedTransaction?.let { transactionWithServices ->
+    if (uiState.isLoading) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+        return
+    }
+
+    val transaction = uiState.selectedTransaction
+    if (transaction == null && !uiState.isLoading) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text("Transaksi tidak ditemukan")
+        }
+        return
+    }
+
+    transaction?.let { transactionWithServices ->
         TransactionDetailContent(
             transaction = transactionWithServices,
             services = uiState.services,
@@ -124,7 +142,6 @@ fun TransactionDetailContent(
     onDelete: () -> Unit = {},
     onStatusChange: () -> Unit = {}
 ) {
-    val formatter = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
     val dateFormatter = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale("id", "ID"))
 
     val statusColor = when (transaction.transaction.status.lowercase()) {
@@ -217,8 +234,7 @@ fun TransactionDetailContent(
                     price = service?.price?.toDouble() ?: 0.0,
                     unit = service?.unit ?: "kg",
                     weight = transactionService.weightKg,
-                    subtotal = transactionService.subtotalPrice,
-                    formatter = formatter
+                    subtotal = transactionService.subtotalPrice
                 )
             }
 
@@ -226,8 +242,7 @@ fun TransactionDetailContent(
             item {
                 PaymentSummaryCard(
                     totalPrice = transaction.transaction.totalPrice,
-                    serviceCount = transaction.transactionServices.size,
-                    formatter = formatter
+                    serviceCount = transaction.transactionServices.size
                 )
             }
 

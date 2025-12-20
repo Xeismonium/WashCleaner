@@ -46,7 +46,7 @@ import com.xeismonium.washcleaner.ui.theme.StatusCompleted
 import com.xeismonium.washcleaner.ui.theme.StatusNew
 import com.xeismonium.washcleaner.ui.theme.StatusProcessing
 import com.xeismonium.washcleaner.ui.theme.StatusReady
-import java.text.NumberFormat
+import com.xeismonium.washcleaner.util.CurrencyUtils
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -56,7 +56,6 @@ fun TransactionCard(
     transaction: LaundryTransactionEntity,
     onClick: () -> Unit
 ) {
-    val formatter = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
     val dateFormatter = SimpleDateFormat("dd MMM yyyy", Locale("id", "ID"))
     val timeFormatter = SimpleDateFormat("HH:mm", Locale("id", "ID"))
 
@@ -206,7 +205,7 @@ fun TransactionCard(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
-                            text = formatter.format(transaction.totalPrice),
+                            text = CurrencyUtils.formatRupiah(transaction.totalPrice),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary

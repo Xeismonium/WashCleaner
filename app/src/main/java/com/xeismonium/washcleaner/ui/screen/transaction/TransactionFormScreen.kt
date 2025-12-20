@@ -2,9 +2,6 @@ package com.xeismonium.washcleaner.ui.screen.transaction
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -12,13 +9,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,25 +17,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Error
-import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -53,9 +34,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -65,16 +44,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.xeismonium.washcleaner.data.local.database.entity.CustomerEntity
 import com.xeismonium.washcleaner.data.local.database.entity.ServiceEntity
+import com.xeismonium.washcleaner.data.local.database.entity.TransactionWithServices
 import com.xeismonium.washcleaner.data.repository.TransactionWithServicesData
 import com.xeismonium.washcleaner.ui.components.common.ModernButton
 import com.xeismonium.washcleaner.ui.components.transaction.CustomerDropdownField
@@ -84,12 +61,9 @@ import com.xeismonium.washcleaner.ui.components.transaction.ServiceItemRow
 import com.xeismonium.washcleaner.ui.components.transaction.ServiceRow
 import com.xeismonium.washcleaner.ui.components.transaction.StatusDropdownField
 import com.xeismonium.washcleaner.ui.theme.WashCleanerTheme
-import java.text.NumberFormat
+import com.xeismonium.washcleaner.util.CurrencyUtils
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
-
-import com.xeismonium.washcleaner.data.local.database.entity.TransactionWithServices
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -115,9 +89,6 @@ fun TransactionFormScreen(
     LaunchedEffect(transactionId) {
         if (transactionId != 0L) {
             viewModel.loadTransactionById(transactionId)
-        } else {
-            // Reset selected transaction when creating new
-            // Assuming viewModel has a method to clear selection or it's null by default
         }
     }
 
@@ -183,16 +154,11 @@ fun TransactionFormContent(
     var estimatedDate by remember { mutableStateOf<Long?>(null) }
     var selectedStatus by remember { mutableStateOf("baru") }
 
-    // Populate form when initialTransaction is loaded
     LaunchedEffect(initialTransaction) {
         initialTransaction?.let { tx ->
             selectedCustomerId = tx.transaction.customerId
             customerName = tx.transaction.customerName ?: ""
             dateIn = tx.transaction.dateIn
-            // Estimated date logic might need adjustment if it's not stored directly or if we want to infer it
-            // For now, let's keep it null or derive if possible. The entity doesn't seem to store estimated date explicitly in the provided snippet.
-            // If needed, we can set it to dateIn + default duration.
-            
             selectedStatus = tx.transaction.status
 
             if (tx.transactionServices.isNotEmpty()) {
@@ -208,7 +174,6 @@ fun TransactionFormContent(
     }
 
     val totalPrice = serviceRows.sumOf { it.subtotal }
-    val formatter = remember { NumberFormat.getCurrencyInstance(Locale("id", "ID")) }
     val dateFormatter = remember { SimpleDateFormat("dd/MM/yyyy", Locale("id", "ID")) }
 
     val isFormValid = customerName.isNotBlank() && serviceRows.any {
@@ -263,7 +228,7 @@ fun TransactionFormContent(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         AnimatedContent(
-                            targetState = formatter.format(totalPrice),
+                            targetState = CurrencyUtils.formatRupiah(totalPrice),
                             transitionSpec = {
                                 (slideInVertically { -it } + fadeIn()) togetherWith
                                         (slideOutVertically { it } + fadeOut())

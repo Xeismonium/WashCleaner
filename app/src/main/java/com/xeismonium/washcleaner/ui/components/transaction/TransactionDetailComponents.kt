@@ -46,7 +46,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -57,7 +56,7 @@ import com.xeismonium.washcleaner.ui.theme.StatusCompleted
 import com.xeismonium.washcleaner.ui.theme.StatusNew
 import com.xeismonium.washcleaner.ui.theme.StatusProcessing
 import com.xeismonium.washcleaner.ui.theme.StatusReady
-import java.text.NumberFormat
+import com.xeismonium.washcleaner.util.CurrencyUtils
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -125,8 +124,7 @@ fun ServiceCard(
     price: Double,
     unit: String,
     weight: Double,
-    subtotal: Double,
-    formatter: NumberFormat
+    subtotal: Double
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -151,7 +149,7 @@ fun ServiceCard(
 
             DetailRow(
                 label = "Harga",
-                value = "${formatter.format(price)} / $unit"
+                value = "${CurrencyUtils.formatRupiah(price)} / $unit"
             )
             DetailRow(
                 label = "Berat",
@@ -172,7 +170,7 @@ fun ServiceCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = formatter.format(subtotal),
+                    text = CurrencyUtils.formatRupiah(subtotal),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
@@ -211,8 +209,7 @@ fun DetailRow(
 @Composable
 fun PaymentSummaryCard(
     totalPrice: Double,
-    serviceCount: Int,
-    formatter: NumberFormat
+    serviceCount: Int
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -251,7 +248,7 @@ fun PaymentSummaryCard(
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = formatter.format(totalPrice),
+                text = CurrencyUtils.formatRupiah(totalPrice),
                 style = MaterialTheme.typography.headlineLarge.copy(
                     fontSize = 32.sp,
                     letterSpacing = (-0.5).sp

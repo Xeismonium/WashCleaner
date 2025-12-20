@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import com.xeismonium.washcleaner.ui.screen.report.ChartDataPoint
 import com.xeismonium.washcleaner.ui.theme.StatusCancelled
 import com.xeismonium.washcleaner.ui.theme.StatusCompleted
-import java.text.NumberFormat
+import com.xeismonium.washcleaner.util.CurrencyUtils
 
 @Composable
 fun SegmentedButtons(
@@ -90,8 +90,7 @@ fun SegmentedButtons(
 fun SummaryCard(
     totalRevenue: Double,
     trendPercentage: Double,
-    selectedPeriod: String,
-    formatter: NumberFormat
+    selectedPeriod: String
 ) {
     val periodLabel = when (selectedPeriod) {
         "day" -> "Hari Ini"
@@ -127,7 +126,7 @@ fun SummaryCard(
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = formatter.format(totalRevenue),
+                text = CurrencyUtils.formatRupiah(totalRevenue),
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface

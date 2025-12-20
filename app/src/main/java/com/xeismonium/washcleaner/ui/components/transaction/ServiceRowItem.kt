@@ -31,7 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.xeismonium.washcleaner.data.local.database.entity.ServiceEntity
-import java.text.NumberFormat
+import com.xeismonium.washcleaner.util.CurrencyUtils
 import java.util.Locale
 import java.util.UUID
 
@@ -53,7 +53,6 @@ fun ServiceRowItem(
 ) {
     var showServiceDropdown by remember { mutableStateOf(false) }
     val selectedService = services.find { it.id == row.serviceId }
-    val formatter = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
 
     Card(
         colors = CardDefaults.cardColors(
@@ -115,7 +114,7 @@ fun ServiceRowItem(
                                 Column {
                                     Text(service.name, fontWeight = FontWeight.Bold)
                                     Text(
-                                        formatter.format(service.price) + "/${service.unit}",
+                                        "${CurrencyUtils.formatRupiah(service.price.toDouble())}/${service.unit}",
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -147,7 +146,7 @@ fun ServiceRowItem(
 
                 // Subtotal Display
                 OutlinedTextField(
-                    value = formatter.format(row.subtotal),
+                    value = CurrencyUtils.formatRupiah(row.subtotal),
                     onValueChange = {},
                     modifier = Modifier.weight(1f),
                     label = { Text("Subtotal") },

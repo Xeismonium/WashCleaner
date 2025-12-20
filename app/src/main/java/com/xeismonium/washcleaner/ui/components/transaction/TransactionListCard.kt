@@ -21,7 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.xeismonium.washcleaner.data.local.database.entity.LaundryTransactionEntity
 import com.xeismonium.washcleaner.ui.components.common.StatusBadge
-import java.text.NumberFormat
+import com.xeismonium.washcleaner.util.CurrencyUtils
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -32,7 +32,6 @@ fun TransactionListCard(
     onClick: () -> Unit
 ) {
     val colorScheme = MaterialTheme.colorScheme
-    val formatter = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
     val dateFormatter = SimpleDateFormat("dd MMM yyyy", Locale("id", "ID"))
 
     Card(
@@ -91,7 +90,7 @@ fun TransactionListCard(
                     color = colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = formatter.format(transaction.totalPrice),
+                    text = CurrencyUtils.formatRupiah(transaction.totalPrice),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = colorScheme.onSurface

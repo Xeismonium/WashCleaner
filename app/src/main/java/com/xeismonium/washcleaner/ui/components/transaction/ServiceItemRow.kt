@@ -36,7 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.xeismonium.washcleaner.data.local.database.entity.ServiceEntity
-import java.text.NumberFormat
+import com.xeismonium.washcleaner.util.CurrencyUtils
 import java.util.Locale
 
 @Composable
@@ -49,7 +49,6 @@ fun ServiceItemRow(
     onRemove: (() -> Unit)?
 ) {
     val selectedService = services.find { it.id == row.serviceId }
-    val formatter = remember { NumberFormat.getCurrencyInstance(Locale("id", "ID")) }
     val colorScheme = MaterialTheme.colorScheme
 
     Surface(
@@ -149,7 +148,7 @@ fun ServiceItemRow(
                         contentAlignment = Alignment.CenterStart
                     ) {
                         Text(
-                            text = formatter.format(row.subtotal),
+                            text = CurrencyUtils.formatRupiah(row.subtotal),
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.SemiBold,
                             color = colorScheme.primary
@@ -169,7 +168,6 @@ fun ServiceDropdownField(
 ) {
     var expanded by remember { mutableStateOf(false) }
     val colorScheme = MaterialTheme.colorScheme
-    val formatter = remember { NumberFormat.getCurrencyInstance(Locale("id", "ID")) }
 
     val borderColor by animateColorAsState(
         targetValue = if (expanded) colorScheme.primary else colorScheme.outline.copy(alpha = 0.3f),
@@ -237,7 +235,7 @@ fun ServiceDropdownField(
                                 fontWeight = FontWeight.Medium
                             )
                             Text(
-                                text = "${formatter.format(service.price)}/${service.unit}",
+                                text = "${CurrencyUtils.formatRupiah(service.price.toDouble())}/${service.unit}",
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.primary
                             )

@@ -1,60 +1,44 @@
 package com.xeismonium.washcleaner.ui.screen.report
 
+import android.content.ContentValues
+import android.os.Environment
+import android.provider.MediaStore
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.xeismonium.washcleaner.ui.components.common.WashCleanerScaffold
 import com.xeismonium.washcleaner.ui.components.report.ReportStatsCard
 import com.xeismonium.washcleaner.ui.components.report.RevenueChartCard
 import com.xeismonium.washcleaner.ui.components.report.SegmentedButtons
 import com.xeismonium.washcleaner.ui.components.report.SummaryCard
 import com.xeismonium.washcleaner.ui.theme.WashCleanerTheme
-import java.text.NumberFormat
-import java.util.Locale
-import android.content.ContentValues
-import android.os.Environment
-import android.provider.MediaStore
-import android.widget.Toast
-import androidx.compose.ui.platform.LocalContext
-
-import com.xeismonium.washcleaner.ui.components.common.WashCleanerScaffold
+import com.xeismonium.washcleaner.util.CurrencyUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -111,8 +95,6 @@ fun ReportContent(
     onDownloadClick: () -> Unit = {},
     onMenuClick: () -> Unit = {}
 ) {
-    val formatter = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
-
     WashCleanerScaffold(
         title = "Laporan Pendapatan",
         onMenuClick = onMenuClick,
@@ -136,8 +118,7 @@ fun ReportContent(
                 SummaryCard(
                     totalRevenue = uiState.totalRevenue,
                     trendPercentage = uiState.trendPercentage,
-                    selectedPeriod = uiState.selectedPeriod,
-                    formatter = formatter
+                    selectedPeriod = uiState.selectedPeriod
                 )
             }
 
@@ -157,7 +138,7 @@ fun ReportContent(
             item {
                 ReportStatsCard(
                     title = "Rata-rata / Transaksi",
-                    value = formatter.format(uiState.averageTransactionValue),
+                    value = CurrencyUtils.formatRupiah(uiState.averageTransactionValue),
                     icon = Icons.Default.Payments,
                     modifier = Modifier.fillMaxSize()
                 )
