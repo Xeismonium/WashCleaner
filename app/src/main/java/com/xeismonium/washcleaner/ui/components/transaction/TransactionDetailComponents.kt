@@ -209,8 +209,11 @@ fun DetailRow(
 @Composable
 fun PaymentSummaryCard(
     totalPrice: Double,
+    paidAmount: Double,
     serviceCount: Int
 ) {
+    val status = com.xeismonium.washcleaner.util.PaymentUtils.getPaymentStatus(paidAmount, totalPrice)
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -233,18 +236,11 @@ fun PaymentSummaryCard(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
-                Surface(
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text(
-                        text = "$serviceCount layanan",
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                }
+                PaymentStatusBadge(
+                    paidAmount = paidAmount,
+                    totalPrice = totalPrice,
+                    showIcon = false
+                )
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
@@ -256,6 +252,18 @@ fun PaymentSummaryCard(
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
+
+            // Show payment progress if not fully paid
+            if (status != com.xeismonium.washcleaner.util.PaymentStatus.PAID) {
+                Spacer(modifier = Modifier.height(16.dp))
+                HorizontalDivider()
+                Spacer(modifier = Modifier.height(16.dp))
+
+                PaymentProgressIndicator(
+                    paidAmount = paidAmount,
+                    totalPrice = totalPrice
+                )
+            }
         }
     }
 }
@@ -298,8 +306,10 @@ fun DateCard(
 @Composable
 fun ActionButtonsFooter(
     onStatusChange: () -> Unit,
+    onAddPayment: () -> Unit,
     onEdit: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    showPaymentButton: Boolean = true
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -310,6 +320,31 @@ fun ActionButtonsFooter(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            // Payment button (if not fully paid)
+            if (showPaymentButton) {
+                Button(
+                    onClick = onAddPayment,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = StatusCompleted
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Tambah Pembayaran",
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
             Button(
                 onClick = onStatusChange,
                 modifier = Modifier

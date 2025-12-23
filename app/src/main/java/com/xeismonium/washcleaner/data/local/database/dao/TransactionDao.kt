@@ -76,6 +76,37 @@ interface TransactionDao {
     @Query("UPDATE transactions SET status = :status WHERE id = :id")
     suspend fun updateStatus(id: Long, status: String): Int
 
+    // Payment queries
+    @Query("SELECT * FROM transactions WHERE paidAmount = 0 ORDER BY dateIn DESC")
+    fun getUnpaidTransactions(): Flow<List<LaundryTransactionEntity>>
+
+    @Query("SELECT * FROM transactions WHERE paidAmount > 0 AND paidAmount < totalPrice ORDER BY dateIn DESC")
+    fun getPartiallyPaidTransactions(): Flow<List<LaundryTransactionEntity>>
+
+    @Query("SELECT * FROM transactions WHERE paidAmount >= totalPrice ORDER BY dateIn DESC")
+    fun getFullyPaidTransactions(): Flow<List<LaundryTransactionEntity>>
+
+    @Query("SELECT COUNT(*) FROM transactions WHERE paidAmount = 0")
+    fun getUnpaidCount(): Flow<Int>
+
+    @Query("SELECT COUNT(*) FROM transactions WHERE paidAmount > 0 AND paidAmount < totalPrice")
+    fun getPartiallyPaidCount(): Flow<Int>
+
+    @Query("SELECT COUNT(*) FROM transactions WHERE paidAmount >= totalPrice")
+    fun getFullyPaidCount(): Flow<Int>
+
+    @Query("SELECT SUM(totalPrice - paidAmount) FROM transactions WHERE paidAmount < totalPrice")
+    fun getTotalOutstandingAmount(): Flow<Double?>
+
+    @Query("SELECT SUM(paidAmount) FROM transactions")
+    fun getTotalPaidAmount(): Flow<Double?>
+
+    @Query("UPDATE transactions SET paidAmount = :paidAmount WHERE id = :id")
+    suspend fun updatePaymentAmount(id: Long, paidAmount: Double): Int
+
+    @Query("UPDATE transactions SET paidAmount = paidAmount + :additionalAmount WHERE id = :id")
+    suspend fun addPayment(id: Long, additionalAmount: Double): Int
+
     // Delete operations
     @Delete
     suspend fun delete(transaction: LaundryTransactionEntity): Int

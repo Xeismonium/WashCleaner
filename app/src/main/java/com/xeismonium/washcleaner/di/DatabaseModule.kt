@@ -2,6 +2,7 @@ package com.xeismonium.washcleaner.di
 
 import android.content.Context
 import androidx.room.Room
+import com.xeismonium.washcleaner.data.local.database.MIGRATION_2_3
 import com.xeismonium.washcleaner.data.local.database.WashCleanerDatabase
 import com.xeismonium.washcleaner.data.local.database.dao.CustomerDao
 import com.xeismonium.washcleaner.data.local.database.dao.ServiceDao
@@ -27,7 +28,9 @@ object DatabaseModule {
             context,
             WashCleanerDatabase::class.java,
             "wash_cleaner_database"
-        ).fallbackToDestructiveMigration(true)
+        )
+            .addMigrations(MIGRATION_2_3)
+            .fallbackToDestructiveMigration(true)
             .build()
     }
 

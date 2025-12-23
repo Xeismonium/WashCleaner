@@ -69,6 +69,7 @@ fun TransactionDetailScreen(
     val events by viewModel.events.collectAsState()
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showStatusDialog by remember { mutableStateOf(false) }
+    var showPaymentDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(transactionId) {
         viewModel.loadTransactionById(transactionId)
@@ -106,7 +107,8 @@ fun TransactionDetailScreen(
             onBack = { navController.navigateUp() },
             onEdit = { navController.navigate("transaction_form/$transactionId") },
             onDelete = { showDeleteDialog = true },
-            onStatusChange = { showStatusDialog = true }
+            onStatusChange = { showStatusDialog = true },
+            onAddPayment = { showPaymentDialog = true }
         )
 
         if (showDeleteDialog) {
@@ -129,6 +131,17 @@ fun TransactionDetailScreen(
                 }
             )
         }
+
+        if (showPaymentDialog) {
+            com.xeismonium.washcleaner.ui.components.transaction.PaymentDialog(
+                transaction = transactionWithServices.transaction,
+                onDismiss = { showPaymentDialog = false },
+                onConfirm = { amount ->
+                    viewModel.addPayment(transactionId, amount)
+                    showPaymentDialog = false
+                }
+            )
+        }
     }
 }
 
@@ -140,7 +153,8 @@ fun TransactionDetailContent(
     onBack: () -> Unit = {},
     onEdit: () -> Unit = {},
     onDelete: () -> Unit = {},
-    onStatusChange: () -> Unit = {}
+    onStatusChange: () -> Unit = {},
+    onAddPayment: () -> Unit = {}
 ) {
     val dateFormatter = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.forLanguageTag("id-ID"))
 
@@ -192,8 +206,10 @@ fun TransactionDetailContent(
         bottomBar = {
             ActionButtonsFooter(
                 onStatusChange = onStatusChange,
+                onAddPayment = onAddPayment,
                 onEdit = onEdit,
-                onDelete = onDelete
+                onDelete = onDelete,
+                showPaymentButton = !transaction.transaction.isPaid
             )
         }
     ) { padding ->
@@ -242,6 +258,7 @@ fun TransactionDetailContent(
             item {
                 PaymentSummaryCard(
                     totalPrice = transaction.transaction.totalPrice,
+                    paidAmount = transaction.transaction.paidAmount,
                     serviceCount = transaction.transactionServices.size
                 )
             }

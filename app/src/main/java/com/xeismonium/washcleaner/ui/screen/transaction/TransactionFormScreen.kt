@@ -99,7 +99,7 @@ fun TransactionFormScreen(
         initialTransaction = uiState.selectedTransaction,
         customers = uiState.customers,
         services = uiState.services,
-        onSave = { customerId, customerName, serviceRows, dateIn, estimatedDate, status, isPaid ->
+        onSave = { customerId, customerName, serviceRows, dateIn, estimatedDate, status, paidAmount ->
             val serviceItems = serviceRows.mapNotNull { row ->
                 row.serviceId?.let { serviceId ->
                     val weight = row.weightKg.toDoubleOrNull() ?: 0.0
@@ -122,7 +122,7 @@ fun TransactionFormScreen(
                         status = status,
                         dateIn = dateIn ?: System.currentTimeMillis(),
                         estimatedDate = estimatedDate,
-                        isPaid = isPaid
+                        paidAmount = paidAmount
                     )
                 } else {
                     viewModel.updateTransactionWithServices(
@@ -134,7 +134,7 @@ fun TransactionFormScreen(
                         dateOut = if (status == "selesai") System.currentTimeMillis() else null,
                         dateIn = dateIn ?: System.currentTimeMillis(),
                         estimatedDate = estimatedDate,
-                        isPaid = isPaid
+                        paidAmount = paidAmount
                     )
                 }
             }
@@ -151,7 +151,7 @@ fun TransactionFormContent(
     initialTransaction: TransactionWithServices? = null,
     customers: List<CustomerEntity> = emptyList(),
     services: List<ServiceEntity> = emptyList(),
-    onSave: (Long?, String?, List<ServiceRow>, Long?, Long?, String, Boolean) -> Unit = { _, _, _, _, _, _, _ -> },
+    onSave: (Long?, String?, List<ServiceRow>, Long?, Long?, String, Double) -> Unit = { _, _, _, _, _, _, _ -> },
     onCancel: () -> Unit = {},
     error: String? = null
 ) {
@@ -161,7 +161,7 @@ fun TransactionFormContent(
     var dateIn by remember { mutableStateOf<Long?>(System.currentTimeMillis()) }
     var estimatedDate by remember { mutableStateOf<Long?>(null) }
     var selectedStatus by remember { mutableStateOf("baru") }
-    var isPaid by remember { mutableStateOf(false) }
+    var paidAmount by remember { mutableStateOf("0") }
 
     LaunchedEffect(initialTransaction) {
         initialTransaction?.let { tx ->
@@ -170,7 +170,7 @@ fun TransactionFormContent(
             dateIn = tx.transaction.dateIn
             estimatedDate = tx.transaction.estimatedDate
             selectedStatus = tx.transaction.status
-            isPaid = tx.transaction.isPaid
+            paidAmount = tx.transaction.paidAmount.toString()
 
             if (tx.transactionServices.isNotEmpty()) {
                 serviceRows = tx.transactionServices.map { item ->
@@ -260,6 +260,7 @@ fun TransactionFormContent(
                         text = "Simpan Transaksi",
                         enabled = isFormValid,
                         onClick = {
+                            val paidAmountValue = paidAmount.toDoubleOrNull() ?: 0.0
                             onSave(
                                 selectedCustomerId,
                                 customerName,
@@ -267,7 +268,7 @@ fun TransactionFormContent(
                                 dateIn,
                                 estimatedDate,
                                 selectedStatus,
-                                isPaid
+                                paidAmountValue
                             )
                         }
                     )
@@ -445,27 +446,42 @@ fun TransactionFormContent(
                 )
             }
 
-            // Payment Status
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { isPaid = !isPaid }
-                    .padding(vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Checkbox(
-                    checked = isPaid,
-                    onCheckedChange = { isPaid = it },
-                    colors = CheckboxDefaults.colors(
-                        checkedColor = MaterialTheme.colorScheme.primary
-                    )
+            // Payment Amount
+            FormField(label = "Pembayaran Awal (Opsional)") {
+                androidx.compose.material3.OutlinedTextField(
+                    value = paidAmount,
+                    onValueChange = { paidAmount = it },
+                    label = { Text("Jumlah Dibayar") },
+                    placeholder = { Text("0") },
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                        keyboardType = androidx.compose.ui.text.input.KeyboardType.Decimal
+                    ),
+                    leadingIcon = {
+                        Text("Rp", style = MaterialTheme.typography.bodyLarge)
+                    },
+                    modifier = Modifier.fillMaxWidth()
                 )
-                Text(
-                    text = "Sudah Dibayar (Lunas)",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
+
+                // Quick buttons
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    androidx.compose.material3.OutlinedButton(
+                        onClick = { paidAmount = "0" },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Belum Bayar")
+                    }
+                    androidx.compose.material3.OutlinedButton(
+                        onClick = { paidAmount = totalPrice.toString() },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Lunas")
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.padding(top = 100.dp))

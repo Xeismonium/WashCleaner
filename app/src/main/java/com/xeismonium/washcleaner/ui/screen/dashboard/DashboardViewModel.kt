@@ -19,9 +19,13 @@ data class DashboardUiState(
     val processingCount: Int = 0,
     val readyCount: Int = 0,
     val completedCount: Int = 0,
-    val overdueCount: Int = 0, // New
-    val unpaidCount: Int = 0, // New
-    val unpaidTotal: Double = 0.0, // New
+    val overdueCount: Int = 0,
+    val unpaidCount: Int = 0,
+    val unpaidTotal: Double = 0.0,
+    val partiallyPaidCount: Int = 0,
+    val partiallyPaidTotal: Double = 0.0,
+    val fullyPaidCount: Int = 0,
+    val fullyPaidTotal: Double = 0.0,
     val totalRevenue: Double = 0.0,
     val todayRevenue: Double = 0.0,
     val recentTransactions: List<LaundryTransactionEntity> = emptyList(),
@@ -95,10 +99,21 @@ class DashboardViewModel @Inject constructor(
                     it.estimatedDate <= todayEnd
                 }
 
-                // Calculate Unpaid
-                val unpaidTransactions = data.allTransactions.filter { !it.isPaid }
+                // Calculate Payment Statuses
+                val unpaidTransactions = data.allTransactions.filter { it.paidAmount == 0.0 }
+                val partiallyPaidTransactions = data.allTransactions.filter {
+                    it.paidAmount > 0.0 && it.paidAmount < it.totalPrice
+                }
+                val fullyPaidTransactions = data.allTransactions.filter { it.paidAmount >= it.totalPrice }
+
                 val unpaidCount = unpaidTransactions.size
                 val unpaidTotal = unpaidTransactions.sumOf { it.totalPrice }
+
+                val partiallyPaidCount = partiallyPaidTransactions.size
+                val partiallyPaidTotal = partiallyPaidTransactions.sumOf { it.totalPrice - it.paidAmount }
+
+                val fullyPaidCount = fullyPaidTransactions.size
+                val fullyPaidTotal = fullyPaidTransactions.sumOf { it.paidAmount }
 
                 // Get 5 most recent transactions
                 val recent = data.allTransactions.take(5)
@@ -111,6 +126,10 @@ class DashboardViewModel @Inject constructor(
                     overdueCount = overdue,
                     unpaidCount = unpaidCount,
                     unpaidTotal = unpaidTotal,
+                    partiallyPaidCount = partiallyPaidCount,
+                    partiallyPaidTotal = partiallyPaidTotal,
+                    fullyPaidCount = fullyPaidCount,
+                    fullyPaidTotal = fullyPaidTotal,
                     totalRevenue = data.totalRevenue,
                     todayRevenue = todayRev,
                     recentTransactions = recent,

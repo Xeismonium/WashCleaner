@@ -37,6 +37,20 @@ interface TransactionRepository {
     fun getTotalPriceByStatus(status: String): Flow<Double?>
     fun getTotalPriceByDateRange(startDate: Long, endDate: Long): Flow<Double?>
 
+    // Payment queries
+    fun getUnpaidTransactions(): Flow<List<LaundryTransactionEntity>>
+    fun getPartiallyPaidTransactions(): Flow<List<LaundryTransactionEntity>>
+    fun getFullyPaidTransactions(): Flow<List<LaundryTransactionEntity>>
+    fun getUnpaidCount(): Flow<Int>
+    fun getPartiallyPaidCount(): Flow<Int>
+    fun getFullyPaidCount(): Flow<Int>
+    fun getTotalOutstandingAmount(): Flow<Double?>
+    fun getTotalPaidAmount(): Flow<Double?>
+
+    // Payment operations
+    suspend fun updatePaymentAmount(id: Long, paidAmount: Double): Int
+    suspend fun addPayment(id: Long, additionalAmount: Double): Int
+
     // Transaction with services relations
     fun getTransactionWithServices(id: Long): Flow<TransactionWithServices?>
     fun getAllTransactionsWithServices(): Flow<List<TransactionWithServices>>
@@ -100,6 +114,38 @@ class TransactionRepositoryImpl @Inject constructor(
 
     override fun getTotalPriceByDateRange(startDate: Long, endDate: Long): Flow<Double?> =
         transactionDao.getTotalPriceByDateRange(startDate, endDate)
+
+    // Payment queries
+    override fun getUnpaidTransactions(): Flow<List<LaundryTransactionEntity>> =
+        transactionDao.getUnpaidTransactions()
+
+    override fun getPartiallyPaidTransactions(): Flow<List<LaundryTransactionEntity>> =
+        transactionDao.getPartiallyPaidTransactions()
+
+    override fun getFullyPaidTransactions(): Flow<List<LaundryTransactionEntity>> =
+        transactionDao.getFullyPaidTransactions()
+
+    override fun getUnpaidCount(): Flow<Int> =
+        transactionDao.getUnpaidCount()
+
+    override fun getPartiallyPaidCount(): Flow<Int> =
+        transactionDao.getPartiallyPaidCount()
+
+    override fun getFullyPaidCount(): Flow<Int> =
+        transactionDao.getFullyPaidCount()
+
+    override fun getTotalOutstandingAmount(): Flow<Double?> =
+        transactionDao.getTotalOutstandingAmount()
+
+    override fun getTotalPaidAmount(): Flow<Double?> =
+        transactionDao.getTotalPaidAmount()
+
+    // Payment operations
+    override suspend fun updatePaymentAmount(id: Long, paidAmount: Double): Int =
+        transactionDao.updatePaymentAmount(id, paidAmount)
+
+    override suspend fun addPayment(id: Long, additionalAmount: Double): Int =
+        transactionDao.addPayment(id, additionalAmount)
 
     // Transaction with services relations
     override fun getTransactionWithServices(id: Long): Flow<TransactionWithServices?> =

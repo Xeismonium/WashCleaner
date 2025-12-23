@@ -11,7 +11,8 @@ import androidx.room.PrimaryKey
         Index(value = ["customerId"]),
         Index(value = ["status"]),
         Index(value = ["dateIn"]),
-        Index(value = ["customerName"])
+        Index(value = ["customerName"]),
+        Index(value = ["paidAmount"])
     ],
     foreignKeys = [
         ForeignKey(
@@ -35,5 +36,9 @@ data class LaundryTransactionEntity(
     val estimatedDate: Long?,
 
     val status: String,
-    val isPaid: Boolean = false
-)
+    val paidAmount: Double = 0.0
+) {
+    // Computed property for backward compatibility
+    val isPaid: Boolean
+        get() = paidAmount >= totalPrice
+}

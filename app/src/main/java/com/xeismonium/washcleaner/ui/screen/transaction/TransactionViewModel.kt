@@ -139,7 +139,7 @@ class TransactionViewModel @Inject constructor(
         status: String = "proses",
         dateIn: Long = System.currentTimeMillis(),
         estimatedDate: Long? = null,
-        isPaid: Boolean = false
+        paidAmount: Double = 0.0
     ) {
         viewModelScope.launch {
             try {
@@ -153,7 +153,7 @@ class TransactionViewModel @Inject constructor(
                     dateOut = null,
                     estimatedDate = estimatedDate,
                     status = status,
-                    isPaid = isPaid
+                    paidAmount = paidAmount
                 )
 
                 val data = TransactionWithServicesData(
@@ -179,7 +179,7 @@ class TransactionViewModel @Inject constructor(
         dateOut: Long?,
         dateIn: Long,
         estimatedDate: Long?,
-        isPaid: Boolean
+        paidAmount: Double
     ) {
         viewModelScope.launch {
             try {
@@ -194,7 +194,7 @@ class TransactionViewModel @Inject constructor(
                     dateOut = dateOut,
                     estimatedDate = estimatedDate,
                     status = status,
-                    isPaid = isPaid
+                    paidAmount = paidAmount
                 )
 
                 val data = TransactionWithServicesData(
@@ -219,6 +219,19 @@ class TransactionViewModel @Inject constructor(
                 _events.value = TransactionEvent.Success
             } catch (e: Exception) {
                 _events.value = TransactionEvent.Error(e.message ?: "Unknown error")
+                _uiState.value = _uiState.value.copy(error = e.message)
+            }
+        }
+    }
+
+    fun addPayment(transactionId: Long, amount: Double) {
+        viewModelScope.launch {
+            try {
+                transactionRepository.addPayment(transactionId, amount)
+                // Don't emit success event here to prevent navigation
+                // Just let the UI update via Flow
+            } catch (e: Exception) {
+                _events.value = TransactionEvent.Error(e.message ?: "Gagal menambah pembayaran")
                 _uiState.value = _uiState.value.copy(error = e.message)
             }
         }

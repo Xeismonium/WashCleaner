@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.xeismonium.washcleaner.ui.theme.StatusCancelled
 import com.xeismonium.washcleaner.ui.theme.StatusCompleted
 import com.xeismonium.washcleaner.ui.theme.StatusNew
@@ -30,7 +31,8 @@ import com.xeismonium.washcleaner.ui.theme.StatusReady
 @Composable
 fun StatusBadge(
     status: String,
-    showIcon: Boolean = true
+    showIcon: Boolean = true,
+    compact: Boolean = false
 ) {
     val (backgroundColor, textColor, text, icon) = when (status.lowercase()) {
         "baru" -> StatusData(
@@ -67,10 +69,13 @@ fun StatusBadge(
 
     Surface(
         color = backgroundColor,
-        shape = RoundedCornerShape(20.dp)
+        shape = RoundedCornerShape(if (compact) 12.dp else 20.dp)
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+            modifier = Modifier.padding(
+                horizontal = if (compact) 8.dp else 10.dp,
+                vertical = if (compact) 4.dp else 6.dp
+            ),
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -79,12 +84,12 @@ fun StatusBadge(
                     imageVector = icon,
                     contentDescription = null,
                     tint = textColor,
-                    modifier = Modifier.size(14.dp)
+                    modifier = Modifier.size(if (compact) 12.dp else 14.dp)
                 )
             }
             Text(
                 text = text,
-                style = MaterialTheme.typography.labelSmall,
+                style = if (compact) MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp) else MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.SemiBold,
                 color = textColor
             )
