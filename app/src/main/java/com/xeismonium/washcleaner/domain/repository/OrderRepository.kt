@@ -6,8 +6,10 @@ import kotlinx.coroutines.flow.Flow
 
 interface OrderRepository {
     fun getOrders(): Flow<Result<List<Order>>>
+    fun getOrdersByCustomerId(customerId: String): Flow<Result<List<Order>>>
     suspend fun getOrderById(id: String): Result<Order?>
     suspend fun createOrder(order: Order): Result<Unit>
     suspend fun updateOrderStatus(id: String, status: OrderStatus): Result<Unit>
     suspend fun deleteOrder(id: String): Result<Unit>
+    suspend fun getNextOrderCounter(): Result<Long>
 }

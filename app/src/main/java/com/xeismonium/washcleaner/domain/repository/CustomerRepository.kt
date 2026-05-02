@@ -8,4 +8,5 @@ interface CustomerRepository {
     suspend fun getCustomerById(id: String): Result<Customer?>
     suspend fun searchCustomers(query: String): Result<List<Customer>>
     suspend fun upsertCustomer(customer: Customer): Result<Unit>
+    suspend fun deleteCustomer(id: String): Result<Unit>
 }

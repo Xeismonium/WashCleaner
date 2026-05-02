@@ -16,8 +16,14 @@ interface OrderDao {
     @Query("SELECT * FROM orders WHERE id = :id")
     suspend fun getOrderById(id: String): OrderEntity?
 
+    @Query("SELECT * FROM orders WHERE customerId = :customerId ORDER BY createdAt DESC")
+    fun getOrdersByCustomerIdFlow(customerId: String): Flow<List<OrderEntity>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrder(order: OrderEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrders(orders: List<OrderEntity>)
 
     @Update
     suspend fun updateOrder(order: OrderEntity)
