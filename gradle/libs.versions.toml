@@ -8,14 +8,15 @@ espressoCore = "3.5.1"
 lifecycleRuntimeKtx = "2.6.1"
 activityCompose = "1.8.0"
 composeBom = "2026.03.00"
-navigationCompose = "2.10.0"
+navigationCompose = "2.9.7"
 hilt = "2.59.2"
+hiltNavigationCompose = "1.2.0"
 firebaseBom = "34.12.0"
 room = "2.8.4"
 workManager = "2.11.0"
 coil = "3.4.0"
-vico = "3.1.0"
-ksp = "2.2.20-1.0.30"
+vico = "2.0.1"
+ksp = "2.2.20-2.0.3"
 googleServices = "4.4.2"
 coroutines = "1.11.0-rc01"
 datastore = "1.2.0"
@@ -40,11 +41,12 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 # Hilt
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
+androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 
 # Firebase
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
-firebase-auth = { group = "com.google.firebase", name = "firebase-auth-ktx" }
-firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore-ktx" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
 
 # Room
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
