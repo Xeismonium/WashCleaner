@@ -10,6 +10,19 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.xeismonium.washcleaner.domain.model.UserRole
+import com.xeismonium.washcleaner.ui.auth.LoginScreen
+import com.xeismonium.washcleaner.ui.auth.RegisterScreen
+import com.xeismonium.washcleaner.ui.auth.SplashScreen
+import com.xeismonium.washcleaner.ui.customer.AddEditCustomerScreen
+import com.xeismonium.washcleaner.ui.customer.CustomerDetailScreen
+import com.xeismonium.washcleaner.ui.customer.CustomerListScreen
+import com.xeismonium.washcleaner.ui.order.CreateOrderScreen
+import com.xeismonium.washcleaner.ui.order.OrderDetailScreen
+import com.xeismonium.washcleaner.ui.order.OrderListScreen
+import com.xeismonium.washcleaner.ui.payment.PaymentScreen
+import com.xeismonium.washcleaner.ui.report.ReportScreen
+import com.xeismonium.washcleaner.ui.settings.SettingsScreen
+import com.xeismonium.washcleaner.ui.settings.StaffManagementScreen
 
 @Composable
 fun NavGraph(
@@ -24,56 +37,130 @@ fun NavGraph(
         modifier = modifier
     ) {
         composable(Route.Splash.route) {
-            PlaceholderScreen("Splash Screen")
+            SplashScreen(
+                onNavigateToMain = {
+                    navController.navigate(Route.Orders.route) {
+                        popUpTo(Route.Splash.route) { inclusive = true }
+                    }
+                },
+                onNavigateToLogin = {
+                    navController.navigate(Route.Login.route) {
+                        popUpTo(Route.Splash.route) { inclusive = true }
+                    }
+                }
+            )
         }
         composable(Route.Login.route) {
-            PlaceholderScreen("Login Screen")
+            LoginScreen(
+                onNavigateToMain = {
+                    navController.navigate(Route.Orders.route) {
+                        popUpTo(Route.Login.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+        composable(Route.Register.route) {
+            RegisterScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToMain = {
+                    navController.navigate(Route.Orders.route) {
+                        popUpTo(Route.Login.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+        composable(Route.ForgotPassword.route) {
+            PlaceholderScreen("Forgot Password Screen")
         }
         composable(Route.Main.route) {
-            PlaceholderScreen("Main Screen")
+            // Main route usually redirects to Orders or is the wrapper itself.
+            // Since MainScreen already hosts NavGraph, this might be redundant.
+            // For now, redirect to Orders.
+            navController.navigate(Route.Orders.route) {
+                popUpTo(Route.Main.route) { inclusive = true }
+            }
         }
         composable(Route.Orders.route) {
-            PlaceholderScreen("Orders Screen")
+            OrderListScreen(
+                onAddOrder = { navController.navigate(Route.AddOrder.route) },
+                onOrderClick = { orderId -> navController.navigate(Route.OrderDetail.createRoute(orderId)) }
+            )
         }
         composable(Route.Customers.route) {
-            PlaceholderScreen("Customers Screen")
+            CustomerListScreen(
+                onAddCustomer = { navController.navigate(Route.AddCustomer.route) },
+                onCustomerClick = { customerId -> navController.navigate(Route.CustomerDetail.createRoute(customerId)) }
+            )
         }
         
         // Reports only available for Admin/Owner
-        if (userRole == UserRole.OWNER) { // Assuming OWNER is the top role, or if you have ADMIN add it
+        if (userRole == UserRole.OWNER) {
             composable(Route.Reports.route) {
-                PlaceholderScreen("Reports Screen")
+                ReportScreen(
+                    onOrderClick = { orderId -> navController.navigate(Route.OrderDetail.createRoute(orderId)) }
+                )
             }
         }
         
         composable(Route.Settings.route) {
-            PlaceholderScreen("Settings Screen")
+            SettingsScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToStaff = { navController.navigate(Route.ManageUsers.route) },
+                onLogout = {
+                    navController.navigate(Route.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            )
         }
         
         // Order Sub-routes
         composable(Route.AddOrder.route) {
-            PlaceholderScreen("Add Order")
+            CreateOrderScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
         composable(Route.OrderDetail.route) { backStackEntry ->
-            val orderId = backStackEntry.arguments?.getString("orderId")
-            PlaceholderScreen("Order Detail: $orderId")
+            val orderId = backStackEntry.arguments?.getString("orderId") ?: ""
+            OrderDetailScreen(
+                orderId = orderId,
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
         composable(Route.EditOrder.route) { backStackEntry ->
-            val orderId = backStackEntry.arguments?.getString("orderId")
-            PlaceholderScreen("Edit Order: $orderId")
+            CreateOrderScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
         
         // Customer Sub-routes
         composable(Route.AddCustomer.route) {
-            PlaceholderScreen("Add Customer")
+            AddEditCustomerScreen(
+                customerId = null,
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
         composable(Route.CustomerDetail.route) { backStackEntry ->
-            val customerId = backStackEntry.arguments?.getString("customerId")
-            PlaceholderScreen("Customer Detail: $customerId")
+            val customerId = backStackEntry.arguments?.getString("customerId") ?: ""
+            CustomerDetailScreen(
+                customerId = customerId,
+                onNavigateBack = { navController.popBackStack() },
+                onEditCustomer = { id -> navController.navigate(Route.EditCustomer.createRoute(id)) },
+                onOrderClick = { orderId -> navController.navigate(Route.OrderDetail.createRoute(orderId)) }
+            )
         }
         composable(Route.EditCustomer.route) { backStackEntry ->
             val customerId = backStackEntry.arguments?.getString("customerId")
-            PlaceholderScreen("Edit Customer: $customerId")
+            AddEditCustomerScreen(
+                customerId = customerId,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Route.Payment.route) {
+            PaymentScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
         
         // Settings Sub-routes
@@ -84,7 +171,9 @@ fun NavGraph(
             PlaceholderScreen("Service Management")
         }
         composable(Route.ManageUsers.route) {
-            PlaceholderScreen("Manage Users")
+            StaffManagementScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
     }
 }
