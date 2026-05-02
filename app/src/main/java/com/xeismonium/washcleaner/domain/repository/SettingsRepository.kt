@@ -9,4 +9,5 @@ interface SettingsRepository {
     suspend fun updateStoreSettings(settings: StoreSettings): Result<Unit>
     fun getStaff(): Flow<Result<List<User>>>
     suspend fun addStaff(user: User): Result<Unit>
+    suspend fun deleteStaff(id: String): Result<Unit>
 }
