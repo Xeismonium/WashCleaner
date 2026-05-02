@@ -15,11 +15,13 @@ import com.xeismonium.washcleaner.domain.model.UserRole
 fun NavGraph(
     navController: NavHostController,
     userRole: UserRole? = null,
-    startDestination: String = Route.Splash.route
+    startDestination: String = Route.Splash.route,
+    modifier: Modifier = Modifier
 ) {
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = startDestination,
+        modifier = modifier
     ) {
         composable(Route.Splash.route) {
             PlaceholderScreen("Splash Screen")
