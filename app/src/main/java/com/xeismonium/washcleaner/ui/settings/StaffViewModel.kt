@@ -43,7 +43,7 @@ class StaffViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    fun addStaff(name: String, email: String) {
+    fun createStaff(name: String, email: String, password: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             val newUser = User(
@@ -53,6 +53,8 @@ class StaffViewModel @Inject constructor(
                 role = UserRole.STAFF,
                 isActive = true
             )
+            // In a real app, we would also create the Firebase Auth account here.
+            // For now, we create the Firestore profile.
             settingsRepository.addStaff(newUser)
                 .onSuccess {
                     _uiState.update { it.copy(isLoading = false, isSuccess = true) }

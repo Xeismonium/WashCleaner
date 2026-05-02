@@ -11,9 +11,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
@@ -24,6 +28,7 @@ import androidx.navigation.compose.rememberNavController
 import com.xeismonium.washcleaner.domain.model.UserRole
 import com.xeismonium.washcleaner.navigation.NavGraph
 import com.xeismonium.washcleaner.navigation.Route
+import kotlinx.coroutines.launch
 
 private data class BottomNavItem(
     val route: String,
@@ -46,10 +51,13 @@ fun MainScreen(
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     MainContent(
         userRole = userRole,
         currentRoute = currentDestination?.route,
+        snackbarHostState = snackbarHostState,
         onNavigate = { route ->
             navController.navigate(route) {
                 popUpTo(navController.graph.findStartDestination().id) {
@@ -63,7 +71,12 @@ fun MainScreen(
         NavGraph(
             navController = navController,
             userRole = userRole,
-            startDestination = Route.Orders.route,
+            onAccessDenied = {
+                scope.launch {
+                    snackbarHostState.showSnackbar("Access Denied")
+                }
+            },
+            startDestination = Route.Splash.route,
             modifier = Modifier.padding(innerPadding)
         )
     }
@@ -73,20 +86,30 @@ fun MainScreen(
 fun MainContent(
     userRole: UserRole,
     currentRoute: String?,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     onNavigate: (String) -> Unit,
     content: @Composable (PaddingValues) -> Unit
 ) {
+    val showBottomBar = currentRoute != null && 
+                        currentRoute != Route.Splash.route && 
+                        currentRoute != Route.Login.route &&
+                        currentRoute != Route.Register.route &&
+                        currentRoute != Route.ForgotPassword.route
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
-            NavigationBar {
-                bottomNavItems.filter { userRole in it.allowedRoles }.forEach { item ->
-                    val selected = currentRoute == item.route || currentRoute?.startsWith(item.route + "/") == true
-                    NavigationBarItem(
-                        icon = { Icon(item.icon, contentDescription = item.title) },
-                        label = { Text(item.title) },
-                        selected = selected,
-                        onClick = { onNavigate(item.route) }
-                    )
+            if (showBottomBar) {
+                NavigationBar {
+                    bottomNavItems.filter { userRole in it.allowedRoles }.forEach { item ->
+                        val selected = currentRoute == item.route || currentRoute?.startsWith(item.route + "/") == true
+                        NavigationBarItem(
+                            icon = { Icon(item.icon, contentDescription = item.title) },
+                            label = { Text(item.title) },
+                            selected = selected,
+                            onClick = { onNavigate(item.route) }
+                        )
+                    }
                 }
             }
         }
