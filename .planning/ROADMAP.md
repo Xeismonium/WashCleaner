@@ -21,11 +21,13 @@
   1. App launches with a splash screen and navigates to a placeholder home.
   2. Local database (Room) schema is initialized and verifiable.
   3. Background sync worker (WorkManager) is scheduled and logs attempts.
-**Plans**: 4 plans
-- [ ] 01-01-PLAN.md — Setup multi-module structure and Hilt DI.
-- [ ] 01-02-PLAN.md — Implement Room database and core entities.
-- [ ] 01-03-PLAN.md — Setup WorkManager and placeholder SyncWorker.
-- [ ] 01-04-PLAN.md — Implement Splash Screen and NavHost.
+**Plans**: 6 plans
+- [ ] 01-00-PLAN.md — Initialize test stubs for Room and SyncWorker.
+- [ ] 01-01-PLAN.md — Setup multi-module structure and centralized dependencies.
+- [ ] 01-02-PLAN.md — Initialize Application with Hilt and migrate theme.
+- [ ] 01-03-PLAN.md — Implement Room database and core entities.
+- [ ] 01-04-PLAN.md — Setup WorkManager and placeholder SyncWorker.
+- [ ] 01-05-PLAN.md — Implement Splash Screen and NavHost.
 
 ### Phase 2: Authentication & Security
 **Goal**: Users can securely access their role-appropriate features.
@@ -41,7 +43,7 @@
 
 ### Phase 3: Store & Staff Settings
 **Goal**: Owners can configure the business environment.
-**Depends on**: Phase 2
+**Depends on**: Phase 3
 **Requirements**: SET-01, SET-02, SET-03
 **Success Criteria**:
   1. Owner can set laundry rates (e.g., Price per KG for "Kiloan").
@@ -107,7 +109,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Project Foundation | 0/4 | Not started | - |
+| 1. Project Foundation | 0/6 | Not started | - |
 | 2. Authentication & Security | 0/0 | Not started | - |
 | 3. Store & Staff Settings | 0/0 | Not started | - |
 | 4. Customer Management | 0/0 | Not started | - |
