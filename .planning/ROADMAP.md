@@ -4,29 +4,32 @@
 - [v1.1 - Data & Domain Layer](milestones/v1.1-ROADMAP.md) (Completed 1 May 2026)
 - [v1.2 - Auth, Navigation & Core UI Components](milestones/v1.2-ROADMAP.md) (Completed 1 May 2026)
 - [v1.3 - Feature Screens](milestones/v1.3-ROADMAP.md) (Completed 1 May 2026)
+- [v1.4 - Hardening & Quality](milestones/v1.4-ROADMAP.md) (Completed 1 May 2026)
 
-## Milestone v1.4: Hardening & Quality
+## Milestone v1.5: Auth Implementation
 
-- [ ] **Phase 5: Hardening & Quality** - Finalize security, background tasks, and comprehensive testing.  
+- [ ] **Phase 6: Auth Implementation** - Connect navigation and finalize auth features.
 
 ## Phase Details
 
-### Phase 5: Hardening & Quality
-**Goal**: Harden the application for production with security rules, background reminders, and unit tests.
-**Depends on**: Phase 4 (Archived)
-**Requirements**: SEC-01..03, WORK-01..03, TEST-01..03, INF-10..11
+### Phase 6: Auth Implementation
+**Goal**: Replace placeholders with real screens and implement full authentication features (Registration, Forgot Password, RBAC).
+**Depends on**: Phase 5 (Hardening & Quality)
+**Requirements**: NAV-01..03, AUTH-01..04, USER-01
 **Success Criteria**:
-  1. Firestore Security Rules and Indexes are deployed and verified.
-  2. Pickup reminders trigger correctly for overdue orders.
-  3. All specified unit tests (Order, Payment, Customer) pass.
-  4. Hilt Worker injection is functional.
+  1. `NavGraph` uses real screens instead of placeholders.
+  2. `SplashScreen` correctly directs users based on auth state.
+  3. Users can register and reset their passwords.
+  4. Access to Reports and Staff Management is restricted to Owner role.
+  5. Session persists across app restarts.
 **Plans**:
-- [ ] 05-01-PLAN.md — Security & Cloud Configuration
-- [ ] 05-02-PLAN.md — Background Tasks & Infrastructure
-- [ ] 05-03-PLAN.md — Unit Testing Suite
+- [ ] 06-01-PLAN.md — Navigation & Splash Logic
+- [ ] 06-02-PLAN.md — Registration & Password Reset
+- [ ] 06-03-PLAN.md — Role-Based Access & Staff Management
 
 ## Progress Table
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 5. Hardening & Quality | 0/3 | In Progress | - |
+| 5. Hardening & Quality | 3/3 | Completed | 1 May 2026 |
+| 6. Auth Implementation | 0/3 | Active | - |
