@@ -31,6 +31,9 @@ interface OrderDao {
     @Query("UPDATE orders SET status = :status, updatedAt = :updatedAt WHERE id = :id")
     suspend fun updateStatus(id: String, status: OrderStatus, updatedAt: Long)
 
+    @Query("UPDATE orders SET paymentStatus = :paymentStatus, paidAmount = :paidAmount, updatedAt = :updatedAt WHERE id = :id")
+    suspend fun updatePayment(id: String, paymentStatus: com.xeismonium.washcleaner.domain.model.PaymentStatus, paidAmount: Double, updatedAt: Long)
+
     @Delete
     suspend fun deleteOrder(order: OrderEntity)
 }

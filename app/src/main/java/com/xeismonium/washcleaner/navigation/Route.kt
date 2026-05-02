@@ -29,6 +29,10 @@ sealed class Route(val route: String) {
     object EditCustomer : Route("edit_customer/{customerId}") {
         fun createRoute(customerId: String) = "edit_customer/$customerId"
     }
+
+    object Payment : Route("payment/{orderId}") {
+        fun createRoute(orderId: String) = "payment/$orderId"
+    }
     
     // Settings Sub-routes
     object StoreSettings : Route("store_settings")

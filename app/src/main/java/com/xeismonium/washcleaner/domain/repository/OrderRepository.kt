@@ -10,6 +10,7 @@ interface OrderRepository {
     suspend fun getOrderById(id: String): Result<Order?>
     suspend fun createOrder(order: Order): Result<Unit>
     suspend fun updateOrderStatus(id: String, status: OrderStatus): Result<Unit>
+    suspend fun updateOrderPayment(id: String, paymentStatus: com.xeismonium.washcleaner.domain.model.PaymentStatus, paidAmount: Double): Result<Unit>
     suspend fun deleteOrder(id: String): Result<Unit>
     suspend fun getNextOrderCounter(): Result<Long>
 }

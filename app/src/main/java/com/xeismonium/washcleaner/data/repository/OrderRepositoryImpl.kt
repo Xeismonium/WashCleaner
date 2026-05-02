@@ -106,6 +106,19 @@ class OrderRepositoryImpl @Inject constructor(
         firestoreDataSource.updateDocument("orders", id, updates).getOrThrow()
     }
 
+    override suspend fun updateOrderPayment(id: String, paymentStatus: PaymentStatus, paidAmount: Double): Result<Unit> = runCatching {
+        val now = System.currentTimeMillis()
+        orderDao.updatePayment(id, paymentStatus, paidAmount, now)
+        
+        val updates = mapOf(
+            "paymentStatus" to paymentStatus.name,
+            "paidAmount" to paidAmount,
+            "updatedAt" to FieldValue.serverTimestamp()
+        )
+        
+        firestoreDataSource.updateDocument("orders", id, updates).getOrThrow()
+    }
+
     override suspend fun deleteOrder(id: String): Result<Unit> = runCatching {
         val entity = orderDao.getOrderById(id)
         if (entity != null) {
