@@ -57,6 +57,12 @@ fun NavGraph(
                     navController.navigate(Route.Orders.route) {
                         popUpTo(Route.Login.route) { inclusive = true }
                     }
+                },
+                onNavigateToRegister = {
+                    navController.navigate(Route.Register.route)
+                },
+                onNavigateToForgotPassword = {
+                    navController.navigate(Route.ForgotPassword.route)
                 }
             )
         }
