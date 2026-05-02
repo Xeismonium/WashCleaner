@@ -1,0 +1,50 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isOwner() {
+      return isAuthenticated() && getUserData().role == 'OWNER';
+    }
+
+    function isActiveUser() {
+      return isAuthenticated() && getUserData().isActive == true;
+    }
+
+    // Collection rules
+
+    // Users: Users can read their own profile. Owners can read all profiles.
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isOwner());
+      allow write: if isOwner();
+    }
+
+    // Customers: Authenticated active users can read and write customer data.
+    match /customers/{customerId} {
+      allow read, write: if isActiveUser();
+    }
+
+    // Services: Authenticated active users can read. Only owners can manage services.
+    match /services/{serviceId} {
+      allow read: if isActiveUser();
+      allow write: if isOwner();
+    }
+
+    // Orders: Authenticated active users can read and write orders.
+    match /orders/{orderId} {
+      allow read, write: if isActiveUser();
+    }
+    
+    // Settings: Only owners can read and write store settings.
+    match /settings/{settingId} {
+      allow read, write: if isOwner();
+    }
+  }
+}
