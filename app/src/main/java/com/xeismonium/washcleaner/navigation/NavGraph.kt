@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -29,6 +30,7 @@ import com.xeismonium.washcleaner.ui.settings.StaffManagementScreen
 fun NavGraph(
     navController: NavHostController,
     userRole: UserRole? = null,
+    onAccessDenied: () -> Unit = {},
     startDestination: String = Route.Splash.route,
     modifier: Modifier = Modifier
 ) {
@@ -102,9 +104,16 @@ fun NavGraph(
             )
         }
         
-        // Reports only available for Admin/Owner
-        if (userRole == UserRole.OWNER) {
-            composable(Route.Reports.route) {
+        // Reports only available for OWNER
+        composable(Route.Reports.route) {
+            if (userRole != UserRole.OWNER) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Route.Orders.route) {
+                        popUpTo(Route.Reports.route) { inclusive = true }
+                    }
+                    onAccessDenied()
+                }
+            } else {
                 ReportScreen(
                     onOrderClick = { orderId -> navController.navigate(Route.OrderDetail.createRoute(orderId)) }
                 )
@@ -180,9 +189,18 @@ fun NavGraph(
             PlaceholderScreen("Service Management")
         }
         composable(Route.ManageUsers.route) {
-            StaffManagementScreen(
-                onNavigateBack = { navController.popBackStack() }
-            )
+            if (userRole != UserRole.OWNER) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Route.Orders.route) {
+                        popUpTo(Route.ManageUsers.route) { inclusive = true }
+                    }
+                    onAccessDenied()
+                }
+            } else {
+                StaffManagementScreen(
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
         }
     }
 }
