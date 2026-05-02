@@ -4,6 +4,8 @@ sealed class Route(val route: String) {
     // Auth & Onboarding
     object Splash : Route("splash")
     object Login : Route("login")
+    object Register : Route("register")
+    object ForgotPassword : Route("forgot_password")
     
     // Main Tabs
     object Main : Route("main")

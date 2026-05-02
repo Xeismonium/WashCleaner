@@ -117,7 +117,7 @@ class PaymentViewModel @Inject constructor(
         sb.append("Terima kasih telah menggunakan jasa kami!")
         
         return try {
-            URLEncoder.encode(sb.toString(), StandardCharsets.UTF_8.toString())
+            URLEncoder.encode(sb.toString(), StandardCharsets.UTF_8.toString()).replace("+", "%20")
         } catch (e: Exception) {
             ""
         }

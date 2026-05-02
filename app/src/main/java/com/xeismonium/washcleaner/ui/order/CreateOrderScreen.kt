@@ -133,7 +133,7 @@ fun CreateOrderContent(
                 ) {
                     services.forEach { service ->
                         DropdownMenuItem(
-                            text = { Text("${service.name} (${CurrencyFormatter.format(service.price)}/${service.unit})") },
+                            text = { Text("${service.name} (${CurrencyFormatter.formatRupiah(service.price)}/${service.unit})") },
                             onClick = {
                                 selectedService = service
                                 serviceExpanded = false
@@ -173,7 +173,7 @@ fun CreateOrderContent(
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(text = "Total Harga", style = MaterialTheme.typography.labelMedium)
                     Text(
-                        text = CurrencyFormatter.format(totalPrice),
+                        text = CurrencyFormatter.formatRupiah(totalPrice),
                         style = MaterialTheme.typography.headlineMedium,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )

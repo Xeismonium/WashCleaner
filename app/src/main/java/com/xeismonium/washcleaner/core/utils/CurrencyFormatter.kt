@@ -9,11 +9,11 @@ object CurrencyFormatter {
         maximumFractionDigits = 0
     }
 
-    fun format(amount: Double): String {
+    fun formatRupiah(amount: Double): String {
         return currencyFormat.format(amount)
     }
 
-    fun format(amount: Long): String {
+    fun formatRupiah(amount: Long): String {
         return currencyFormat.format(amount)
     }
 }

@@ -13,6 +13,7 @@ data class Order(
     val orderCode: String = "",
     val customerId: String = "",
     val customerName: String = "",
+    val customerPhone: String = "",
     val serviceId: String = "",
     val serviceName: String = "",
     val weight: Double = 0.0,

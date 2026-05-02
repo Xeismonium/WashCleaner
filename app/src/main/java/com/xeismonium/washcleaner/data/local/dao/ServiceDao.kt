@@ -18,6 +18,9 @@ interface ServiceDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertService(service: ServiceEntity)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertServices(services: List<ServiceEntity>)
+
     @Update
     suspend fun updateService(service: ServiceEntity)
 
