@@ -8,17 +8,24 @@ The single most important value is providing an efficient and reliable way to tr
 
 ## Current State
 - **v1.0 - Project Foundation** (Shipped 1 May 2026): Core architecture, dependency management, and package skeleton established.
+- **v1.1 - Data & Domain Layer** (Shipped 1 May 2026): Complete Domain models, Repositories, Room database, and Firestore synchronization.
 
 ## Active Milestone: [TBD]
 - (In planning)
 
 ## Requirements
-...
 - [x] Milestone: v1.0 - Project Foundation
     - [x] Set up complete project foundation (Gradle, Hilt, Firebase, Room, etc.)
     - [x] Establish full package hierarchy with placeholder files.
     - [x] Implement base theme and single entry point (MainActivity).
+- [x] Milestone: v1.1 - Data & Domain Layer
+    - [x] Implement Domain models (User, Order, Customer, Service, StoreSettings).
+    - [x] Implement Repository interfaces and implementations.
+    - [x] Setup Room entities, DAOs, and database.
+    - [x] Implement Firestore data source and sync logic.
+    - [x] Configure Hilt DI modules for data and domain layers.
 - [ ] Role-based access control (Owner vs Staff)
+...
 - [ ] Order management (CRUD, status tracking, filtering)
 - [ ] Customer database (CRUD, search, history)
 - [ ] Cashier and Payment (Payment tracking, WhatsApp receipts)
