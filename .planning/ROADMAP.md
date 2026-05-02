@@ -10,8 +10,8 @@
 
 ### Phase 2: Data & Domain Layer
 **Goal**: Implement core business logic, persistence, and remote synchronization.
-**Depends on**: Phase 1 (Archived)
-**Requirements**: DOM-MOD-01, DOM-REP-01, DOM-UC-01, LOC-DATA-01, REM-DATA-01, SYNC-01, INF-08, INF-09
+**Depends on**: Phase 1
+**Requirements**: DOM-MOD-01, DOM-MOD-02, DOM-REP-01, DOM-REP-02, DOM-REP-03, DOM-REP-04, DOM-REP-05, DOM-UC-01, DOM-UC-02, DOM-UC-03, LOC-DATA-01, LOC-DATA-02, LOC-DATA-03, LOC-DATA-04, REM-DATA-01, REM-DATA-02, REM-DATA-03, SYNC-01, SYNC-02, SYNC-03, INF-08, INF-09
 **Success Criteria**:
   1. All Domain models and Repository interfaces are implemented.
   2. Room database is fully functional with entities and DAOs.
@@ -20,9 +20,9 @@
   5. Hilt modules are configured for all layers.
   6. Project compiles successfully.
 **Plans**: 5 plans
-- [ ] 02-01-PLAN.md — Domain Layer - Models & Interfaces
+- [x] 02-01-PLAN.md — Domain Layer - Models & Interfaces
 - [ ] 02-02-PLAN.md — Local Data Layer - Room Setup
-- [ ] 02-03-PLAN.md — Remote Data Layer & Utilities
+- [x] 02-03-PLAN.md — Remote Data Layer & Utilities
 - [ ] 02-04-PLAN.md — Repository Implementations & Session Persistence
 - [ ] 02-05-PLAN.md — Use Cases & Dependency Injection
 
@@ -68,7 +68,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 2. Data & Domain Layer | 0/5 | Not started | - |
+| 2. Data & Domain Layer | 2/5 | Executing | - |
 | 3. Authentication & Core UI | 0/0 | Not started | - |
 | 4. Customer & Order Management | 0/0 | Not started | - |
 | 5. Cashier & Payments | 0/0 | Not started | - |
