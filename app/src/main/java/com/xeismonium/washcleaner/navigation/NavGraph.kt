@@ -10,6 +10,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.xeismonium.washcleaner.domain.model.UserRole
+import com.xeismonium.washcleaner.ui.auth.ForgotPasswordScreen
 import com.xeismonium.washcleaner.ui.auth.LoginScreen
 import com.xeismonium.washcleaner.ui.auth.RegisterScreen
 import com.xeismonium.washcleaner.ui.auth.SplashScreen
@@ -70,7 +71,9 @@ fun NavGraph(
             )
         }
         composable(Route.ForgotPassword.route) {
-            PlaceholderScreen("Forgot Password Screen")
+            ForgotPasswordScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
         composable(Route.Main.route) {
             // Main route usually redirects to Orders or is the wrapper itself.
